@@ -1,0 +1,6 @@
+@import "../src/styles.css";
+
+html,
+body {
+  min-height: 100%;
+}
