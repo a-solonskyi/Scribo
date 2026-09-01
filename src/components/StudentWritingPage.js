@@ -22,21 +22,6 @@ import {
 import EssayEditor from "./EssayEditor";
 import { ErrorState, LoadingState } from "./LoadingState";
 
-const WRITING_PHRASES = [
-  "Verba volant, scripta manent",
-  "Nulla dies sine linea",
-  "Litera scripta manet",
-  "Scribere est cogitare",
-  "Nescit vox missa reverti",
-  "Qui scribit, bis legit",
-  "Calamus gladio fortior",
-  "Scripta publica probant",
-  "Nota bene",
-  "Gesta non verba",
-  "Quantum sufficit",
-  "Verbatim et literatim",
-];
-
 function getDraftKey(publicToken) {
   return `scribo-student-draft:${publicToken}`;
 }
@@ -96,10 +81,6 @@ export default function StudentWritingPage() {
   const originMapRef = useRef([]);
 
   const textStats = useMemo(() => getTextStats(essayText), [essayText]);
-  const writingPhrase = useMemo(
-    () => WRITING_PHRASES[Math.floor(Math.random() * WRITING_PHRASES.length)],
-    []
-  );
 
   useEffect(() => {
     async function loadAssignment() {
@@ -409,7 +390,6 @@ export default function StudentWritingPage() {
 
   return (
     <form className="student-shell" onSubmit={handleSubmit}>
-      <p className="student-writing-phrase">"{writingPhrase}"</p>
       <div className="student-header">
         <div>
           <h1>{assignment?.topic}</h1>
