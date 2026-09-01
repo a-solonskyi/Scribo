@@ -1040,13 +1040,24 @@ button:disabled {
 
 .student-shell {
   position: relative;
-  max-width: 1180px;
+  max-width: 1464px;
   margin: 0 auto;
   min-height: calc(100vh - 112px);
 }
 
 .student-shell.narrow {
   max-width: 680px;
+}
+
+.student-shell:not(.narrow) {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  column-gap: 44px;
+  align-content: start;
+}
+
+.student-shell:not(.narrow) > :not(.student-writing-phrase) {
+  grid-column: 2;
 }
 
 .student-header {
@@ -1078,9 +1089,9 @@ button:disabled {
 }
 
 .student-writing-phrase {
-  position: absolute;
-  top: 0;
-  left: 0;
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
   margin: 0;
   color: var(--medium-gray);
   font-size: 11px;
@@ -1089,7 +1100,13 @@ button:disabled {
 }
 
 .student-header {
+  grid-row: 1;
   padding-top: 30px;
+}
+
+.student-shell .essay-main {
+  width: 100%;
+  margin: 0;
 }
 
 .submitted-download-button {
@@ -2057,6 +2074,19 @@ button:disabled {
   .auth-screen,
   .student-shell {
     padding: 28px 20px 56px;
+  }
+
+  .student-shell:not(.narrow) {
+    display: block;
+    max-width: 1180px;
+  }
+
+  .student-writing-phrase {
+    margin-bottom: 18px;
+  }
+
+  .student-header {
+    padding-top: 0;
   }
 
   .inline-create,
