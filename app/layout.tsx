@@ -4,6 +4,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Skribo Essay",
   description: "Essay writing, process analytics, and professor response.",
+  icons: {
+    icon: "/icon.svg",
+  },
   openGraph: {
     title: "Skribo Essay",
     description: "Writing process, analytics, and response.",

@@ -22,6 +22,21 @@ import {
 import EssayEditor from "./EssayEditor";
 import { ErrorState, LoadingState } from "./LoadingState";
 
+const WRITING_PHRASES = [
+  "Verba volant, scripta manent",
+  "Nulla dies sine linea",
+  "Litera scripta manet",
+  "Scribere est cogitare",
+  "Nescit vox missa reverti",
+  "Qui scribit, bis legit",
+  "Calamus gladio fortior",
+  "Scripta publica probant",
+  "Nota bene",
+  "Gesta non verba",
+  "Quantum sufficit",
+  "Verbatim et literatim",
+];
+
 function getDraftKey(publicToken) {
   return `scribo-student-draft:${publicToken}`;
 }
@@ -81,6 +96,10 @@ export default function StudentWritingPage() {
   const originMapRef = useRef([]);
 
   const textStats = useMemo(() => getTextStats(essayText), [essayText]);
+  const writingPhrase = useMemo(
+    () => WRITING_PHRASES[Math.floor(Math.random() * WRITING_PHRASES.length)],
+    []
+  );
 
   useEffect(() => {
     async function loadAssignment() {
@@ -346,6 +365,29 @@ export default function StudentWritingPage() {
     }
   }
 
+  function downloadSubmittedEssay() {
+    const safeTopic = (assignment?.topic || "submitted-essay")
+      .trim()
+      .replace(/[^\p{L}\p{N}]+/gu, "-")
+      .replace(/^-+|-+$/g, "")
+      .toLowerCase() || "submitted-essay";
+    const contents = [
+      assignment?.topic,
+      studentName.trim(),
+      "",
+      essayText,
+    ].filter((value) => value !== undefined && value !== null).join("\n");
+    const blob = new Blob([contents], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${safeTopic}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+
   if (loading) return <LoadingState label="Loading assignment" />;
 
   if (submitted) {
@@ -354,12 +396,20 @@ export default function StudentWritingPage() {
         <p className="eyebrow">Submitted</p>
         <h1>Essay submitted</h1>
         <p>Your essay and writing-process data have been sent to your professor.</p>
+        <button
+          className="filled-button submitted-download-button"
+          type="button"
+          onClick={downloadSubmittedEssay}
+        >
+          Download my essay
+        </button>
       </div>
     );
   }
 
   return (
     <form className="student-shell" onSubmit={handleSubmit}>
+      <p className="student-writing-phrase">"{writingPhrase}"</p>
       <div className="student-header">
         <div>
           <h1>{assignment?.topic}</h1>

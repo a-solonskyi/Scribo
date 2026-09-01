@@ -1,58 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import { Pause, Play, RotateCcw, SkipForward } from "lucide-react";
 
 import { getReplayDuration } from "../utils/replayEngine";
 import { formatDuration } from "../utils/timeFormatting";
 
 const SPEEDS = [1, 2, 5, 10, 20];
-
-function PlayIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M8.5 5.5 L18.5 12 L8.5 18.5 Z" />
-    </svg>
-  );
-}
-
-function PauseIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M7 5 H10 V19 H7 Z" />
-      <path d="M14 5 H17 V19 H14 Z" />
-    </svg>
-  );
-}
-
-function ResetIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        d="M3 12 A9 9 0 1 0 6.2 5.1"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M6 3 V7 H10"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function SkipIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M6.5 5.5 L15.5 12 L6.5 18.5 Z" />
-      <path d="M18 5.5 H20.5 V18.5 H18 Z" />
-    </svg>
-  );
-}
 
 function getEventCharacterVolume(event) {
   return (
@@ -149,7 +101,11 @@ export default function ReplayPlayer({
           aria-label={playing ? "Pause replay" : "Play replay"}
           title={playing ? "Pause" : "Play"}
         >
-          {playing ? <PauseIcon /> : <PlayIcon />}
+          {playing ? (
+            <Pause aria-hidden="true" />
+          ) : (
+            <Play className="replay-play-icon" aria-hidden="true" />
+          )}
         </button>
         <button
           className="replay-icon-button"
@@ -158,7 +114,7 @@ export default function ReplayPlayer({
           aria-label="Reset replay"
           title="Reset"
         >
-          <ResetIcon />
+          <RotateCcw aria-hidden="true" />
         </button>
         <button
           className="replay-icon-button"
@@ -167,7 +123,7 @@ export default function ReplayPlayer({
           aria-label="Skip to end"
           title="Skip to end"
         >
-          <SkipIcon />
+          <SkipForward aria-hidden="true" />
         </button>
         <div className="speed-controls">
           {SPEEDS.map((item) => (

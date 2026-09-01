@@ -3,22 +3,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import Placeholder from "@tiptap/extension-placeholder";
-import { useEffect, useMemo } from "react";
-
-const WRITING_PHRASES = [
-  "Verba volant, scripta manent",
-  "Nulla dies sine linea",
-  "Litera scripta manet",
-  "Scribere est cogitare",
-  "Nescit vox missa reverti",
-  "Qui scribit, bis legit",
-  "Calamus gladio fortior",
-  "Scripta publica probant",
-  "Nota bene",
-  "Gesta non verba",
-  "Quantum sufficit",
-  "Verbatim et literatim",
-];
+import { useEffect } from "react";
 
 const FormattingShortcuts = Extension.create({
   name: "formattingShortcuts",
@@ -103,10 +88,6 @@ export default function EssayEditor({
   onEssayChange,
   onPaste,
 }) {
-  const writingPhrase = useMemo(
-    () => WRITING_PHRASES[Math.floor(Math.random() * WRITING_PHRASES.length)],
-    []
-  );
   const editor = useEditor(
     {
       extensions: [
@@ -163,9 +144,6 @@ export default function EssayEditor({
 
   return (
     <section className="editor-panel" aria-label="Essay editor">
-      <label className="field-label essay-label writing-phrase" htmlFor="essay-body">
-        "{writingPhrase}"
-      </label>
       <div className="essay-main">
         <div className="format-toolbar" aria-label="Essay formatting tools">
           <label className="heading-control">

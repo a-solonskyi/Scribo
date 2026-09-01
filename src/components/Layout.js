@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 
 import { signOutProfessor } from "../sites/auth";
-import { getClasses } from "../sites/database";
+import { getAssignment, getClasses, getSubmission } from "../sites/database";
 
 export default function Layout({ children, session }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [classes, setClasses] = useState([]);
+  const [activeEssay, setActiveEssay] = useState(null);
 
   useEffect(() => {
     let mounted = true;
@@ -30,6 +31,50 @@ export default function Layout({ children, session }) {
     };
   }, [session?.user?.id, location.pathname]);
 
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadActiveEssay() {
+      const assignmentMatch = location.pathname.match(/^\/assignment\/([^/]+)/);
+      const submissionMatch = location.pathname.match(/^\/submission\/([^/]+)/);
+
+      try {
+        if (assignmentMatch) {
+          const assignment = await getAssignment(assignmentMatch[1]);
+          if (mounted) {
+            setActiveEssay({
+              id: assignment.id,
+              topic: assignment.topic,
+              classId: assignment.class_id,
+            });
+          }
+          return;
+        }
+
+        if (submissionMatch) {
+          const submission = await getSubmission(submissionMatch[1]);
+          if (mounted) {
+            setActiveEssay({
+              id: submission.assignment_id,
+              topic: submission.assignments?.topic || "Selected essay",
+              classId: submission.assignments?.class_id,
+            });
+          }
+          return;
+        }
+
+        if (mounted) setActiveEssay(null);
+      } catch {
+        if (mounted) setActiveEssay(null);
+      }
+    }
+
+    loadActiveEssay();
+    return () => {
+      mounted = false;
+    };
+  }, [location.pathname]);
+
   async function handleLogout() {
     await signOutProfessor();
     navigate("/login");
@@ -45,11 +90,28 @@ export default function Layout({ children, session }) {
           <NavLink to="/dashboard">Classes</NavLink>
           {classes.length ? (
             <div className="class-hierarchy" aria-label="Class list">
-              {classes.map((item) => (
-                <NavLink key={item.id} to={`/class/${item.id}`}>
-                  {item.name}
-                </NavLink>
-              ))}
+              {classes.map((item) => {
+                const containsActiveEssay = activeEssay?.classId === item.id;
+                return (
+                  <div className="class-tree-item" key={item.id}>
+                    <NavLink
+                      className={({ isActive }) =>
+                        isActive || containsActiveEssay ? "active" : undefined
+                      }
+                      to={`/class/${item.id}`}
+                    >
+                      {item.name}
+                    </NavLink>
+                    {containsActiveEssay ? (
+                      <div className="essay-hierarchy">
+                        <NavLink className="active" to={`/assignment/${activeEssay.id}`}>
+                          {activeEssay.topic}
+                        </NavLink>
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })}
             </div>
           ) : null}
           <button type="button" onClick={handleLogout}>

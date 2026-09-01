@@ -1,7 +1,5 @@
 import { Link } from "react-router-dom";
 
-import { formatDateTime } from "../utils/timeFormatting";
-
 export default function ClassList({ classes, onDelete }) {
   if (!classes.length) {
     return <p className="empty-state">No classes yet. Create one to begin.</p>;
@@ -16,7 +14,6 @@ export default function ClassList({ classes, onDelete }) {
               <h3>{item.name}</h3>
               <p>{item.description || "No description"}</p>
             </div>
-            <span>{formatDateTime(item.created_at)}</span>
           </Link>
           <button
             className="delete-icon-button"

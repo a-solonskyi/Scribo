@@ -3,15 +3,6 @@ import { Link } from "react-router-dom";
 
 import { formatDateTime } from "../utils/timeFormatting";
 
-function ChainIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1" />
-      <path d="M14 11a5 5 0 0 0-7.1 0l-2 2a5 5 0 0 0 7.1 7.1l1.1-1.1" />
-    </svg>
-  );
-}
-
 export default function AssignmentCard({ assignment, onDelete }) {
   const [copied, setCopied] = useState(false);
   const dueDate = assignment.deadline
@@ -34,18 +25,14 @@ export default function AssignmentCard({ assignment, onDelete }) {
         </div>
       </Link>
       <div className="assignment-card-actions">
-        <div className="copy-feedback-wrap">
-          {copied ? <span className="copy-callout">Copied!</span> : null}
-          <button
-            className="copy-icon-button"
-            type="button"
-            aria-label={`Copy student link for ${assignment.topic}`}
-            title="Copy student link"
-            onClick={copyStudentLink}
-          >
-            <ChainIcon />
-          </button>
-        </div>
+        <button
+          className="filled-button"
+          type="button"
+          aria-label={`Copy student link for ${assignment.topic}`}
+          onClick={copyStudentLink}
+        >
+          {copied ? "Copied" : "Copy link"}
+        </button>
         <button
           className="delete-icon-button"
           type="button"

@@ -222,11 +222,13 @@ function getPasteRanges(
 ) {
   if (Array.isArray(originRanges)) {
     const exactRanges = sanitizeOriginRanges(originRanges, finalText.length);
-    return exactRanges.map((range) => ({ ...range, pasteEvent: null }));
+    if (exactRanges.length) {
+      return exactRanges.map((range) => ({ ...range, pasteEvent: null }));
+    }
   }
 
   const eventRanges = getPasteRangesFromEvents(finalText, eventLog, pasteEvents);
-  if (eventRanges.length) return trimRangeWhitespace(finalText, eventRanges);
+  if (eventRanges !== null) return trimRangeWhitespace(finalText, eventRanges);
 
   const matches = [];
   const occupied = new Array(finalText.length).fill(false);
@@ -271,7 +273,7 @@ function trimRangeWhitespace(text, ranges) {
 }
 
 function getPasteRangesFromEvents(finalText, eventLog = [], pasteEvents = []) {
-  if (!finalText || !eventLog.length) return [];
+  if (!finalText || !eventLog.length) return null;
 
   const originMap = reconstructOriginMap(eventLog, pasteEvents);
   const sortedEvents = [...eventLog].sort(
@@ -292,7 +294,7 @@ function getPasteRangesFromEvents(finalText, eventLog = [], pasteEvents = []) {
       reconstructedText.slice(position + deletedCount);
   }
 
-  if (reconstructedText !== finalText) return [];
+  if (reconstructedText !== finalText) return null;
 
   return originMapToRanges(originMap).map((range) => ({
     ...range,

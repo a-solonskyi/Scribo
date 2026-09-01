@@ -288,10 +288,7 @@ button:disabled {
 }
 
 .editor-panel {
-  display: grid;
-  grid-template-columns: minmax(160px, 240px) minmax(0, 1fr);
-  column-gap: 48px;
-  row-gap: 0;
+  display: block;
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -318,6 +315,8 @@ button:disabled {
 }
 
 .essay-main {
+  width: min(720px, 100%);
+  margin: 0 auto;
   min-width: 0;
 }
 
@@ -648,6 +647,21 @@ button:disabled {
 .class-hierarchy a.active,
 .class-hierarchy a:hover {
   color: var(--ink);
+}
+
+.class-tree-item {
+  min-width: 0;
+}
+
+.essay-hierarchy {
+  display: grid;
+  margin: 7px 0 0 8px;
+  padding-left: 10px;
+  border-left: 1px solid var(--light-gray);
+}
+
+.essay-hierarchy a {
+  font-size: 11px;
 }
 
 .sidebar-nav a,
@@ -1025,6 +1039,7 @@ button:disabled {
 }
 
 .student-shell {
+  position: relative;
   max-width: 1180px;
   margin: 0 auto;
   min-height: calc(100vh - 112px);
@@ -1056,6 +1071,29 @@ button:disabled {
 .student-name-field {
   max-width: 420px;
   margin-bottom: 32px;
+}
+
+.student-name-field input {
+  border-bottom: 0;
+}
+
+.student-writing-phrase {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  color: var(--medium-gray);
+  font-size: 11px;
+  line-height: 1.38;
+  letter-spacing: 0.08em;
+}
+
+.student-header {
+  padding-top: 30px;
+}
+
+.submitted-download-button {
+  margin-top: 12px;
 }
 
 .process-note {
@@ -1908,8 +1946,13 @@ button:disabled {
   display: block;
   width: 17px;
   height: 17px;
-  fill: currentColor;
+  fill: none;
   stroke: currentColor;
+  stroke-width: 2;
+}
+
+.replay-icon-button svg.replay-play-icon {
+  fill: currentColor;
 }
 
 .replay-scrubber {
