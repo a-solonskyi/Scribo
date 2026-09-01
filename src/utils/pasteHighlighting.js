@@ -62,11 +62,7 @@ export function getHighlightedHtml(
   sanitizeHtmlTree(doc.body);
 
   const textNodes = [];
-  let fullText = "";
-
-  collectTextNodes(doc.body, textNodes, (text) => {
-    fullText += text;
-  });
+  const fullText = collectFormattedTextNodes(doc.body, textNodes);
 
   const sourceText = plainText || fullText;
   const sourceRanges = getPasteRanges(
@@ -187,22 +183,38 @@ function sanitizeHtmlTree(root) {
   });
 }
 
-function collectTextNodes(root, textNodes, appendText) {
-  const walker = window.document.createTreeWalker(
-    root,
-    window.NodeFilter.SHOW_TEXT
-  );
-  let node = walker.nextNode();
-  let start = 0;
+export function collectFormattedTextNodes(root, textNodes) {
+  const blockTags = new Set(["P", "H1", "H2", "H3"]);
+  let fullText = "";
+  let hasBlock = false;
 
-  while (node) {
-    const text = node.nodeValue || "";
-    const end = start + text.length;
-    textNodes.push({ node, text, start, end });
-    appendText(text);
-    start = end;
-    node = walker.nextNode();
+  function collect(node) {
+    if (node.nodeType === window.Node.TEXT_NODE) {
+      const text = node.nodeValue || "";
+      const start = fullText.length;
+      fullText += text;
+      textNodes.push({ node, text, start, end: fullText.length });
+      return;
+    }
+
+    if (node.nodeType !== window.Node.ELEMENT_NODE) return;
+    if (node.tagName === "BR") {
+      fullText += "\n";
+      return;
+    }
+
+    [...node.childNodes].forEach(collect);
   }
+
+  [...root.childNodes].forEach((node) => {
+    const isBlock =
+      node.nodeType === window.Node.ELEMENT_NODE && blockTags.has(node.tagName);
+    if (isBlock && hasBlock) fullText += "\n\n";
+    collect(node);
+    if (isBlock) hasBlock = true;
+  });
+
+  return fullText;
 }
 
 export function getPasteRangesForText(
