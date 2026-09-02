@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Navigate } from "react-router-dom";
 
 import { activateProfessor } from "../sites/auth";
@@ -16,44 +16,26 @@ const FEATURES = [
 ];
 
 const MOTTO = "Evidence for thoughtful feedback.";
+const TYPEWRITER_START_DELAY = 350;
+const TYPEWRITER_CHARACTER_DELAY = 65;
 
 function TypewriterMotto() {
-  const textRef = useRef(null);
-
-  useEffect(() => {
-    const textNode = textRef.current;
-    if (!textNode) return undefined;
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      textNode.textContent = MOTTO;
-      return undefined;
-    }
-
-    let characterIndex = 0;
-    let typingTimer;
-    const startTimer = window.setTimeout(() => {
-      typingTimer = window.setInterval(() => {
-        characterIndex += 1;
-        textNode.textContent = MOTTO.slice(0, characterIndex);
-        if (characterIndex >= MOTTO.length) window.clearInterval(typingTimer);
-      }, 65);
-    }, 350);
-
-    return () => {
-      window.clearTimeout(startTimer);
-      window.clearInterval(typingTimer);
-    };
-  }, []);
-
   return (
     <h1 className="auth-motto" aria-label={MOTTO}>
-      <span className="auth-motto-reserve" aria-hidden="true">
-        {MOTTO}
-      </span>
-      <span className="auth-motto-typed" aria-hidden="true">
-        <span ref={textRef} />
-        <span className="auth-motto-caret" />
-      </span>
+      {[...MOTTO].map((character, index) => (
+        <span
+          className={`auth-motto-character${
+            index === MOTTO.length - 1 ? " auth-motto-character-final" : ""
+          }`}
+          key={`${character}-${index}`}
+          style={{
+            "--auth-character-delay": `${TYPEWRITER_START_DELAY + index * TYPEWRITER_CHARACTER_DELAY}ms`,
+          }}
+          aria-hidden="true"
+        >
+          {character}
+        </span>
+      ))}
     </h1>
   );
 }

@@ -1161,39 +1161,68 @@ button:disabled {
   letter-spacing: 0;
 }
 
-.auth-motto {
+.auth-motto-character {
   position: relative;
+  opacity: 0;
+  animation: auth-motto-character-reveal 1ms step-end forwards;
+  animation-delay: var(--auth-character-delay);
 }
 
-.auth-motto-reserve {
-  visibility: hidden;
-}
-
-.auth-motto-typed {
+.auth-motto-character::after {
   position: absolute;
-  inset: 0;
+  top: 0.09em;
+  right: -0.02em;
+  height: 0.78em;
+  border-right: 0.05em solid currentColor;
+  content: "";
+  opacity: 0;
+  animation: auth-motto-caret-pass 65ms steps(1, end) forwards;
+  animation-delay: var(--auth-character-delay);
+  pointer-events: none;
 }
 
-.auth-motto-caret {
-  display: inline-block;
-  width: 0;
-  height: 0.78em;
-  margin-left: 0.04em;
-  border-right: 0.05em solid currentColor;
-  vertical-align: -0.05em;
+.auth-motto-character-final::after {
   animation: auth-caret 1s steps(1) infinite;
+  animation-delay: var(--auth-character-delay);
+}
+
+@keyframes auth-motto-character-reveal {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes auth-motto-caret-pass {
+  0%,
+  99% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }
 
 @keyframes auth-caret {
-  50% {
-    border-color: transparent;
+  0%,
+  49% {
+    opacity: 1;
+  }
+
+  50%,
+  100% {
+    opacity: 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .auth-motto-caret {
-    border-right: 0;
+  .auth-motto-character {
+    opacity: 1;
     animation: none;
+  }
+
+  .auth-motto-character::after {
+    display: none;
   }
 }
 
@@ -1260,7 +1289,7 @@ button:disabled {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 78px 54px 30px;
+  padding: 66px 54px 42px;
   border-left: 1px solid var(--ink);
   background: #f3f3f1;
 }
