@@ -4,6 +4,17 @@ import { Navigate } from "react-router-dom";
 import { activateProfessor } from "../sites/auth";
 import { ErrorState } from "./LoadingState";
 
+const FEATURES = [
+  ["Writing replay", "Review the essay as it developed, keystroke by keystroke."],
+  ["Paste detection", "See which final characters originated from pasted text."],
+  ["Process timeline", "Compare writing, revision, pauses, and paste activity over time."],
+  ["Professor response", "Highlight passages, comment, and draw directly on the essay."],
+  [
+    "Writing details",
+    "Trace active and idle time, typing pace, pauses, revisions, deletions, and paste events.",
+  ],
+];
+
 export default function LoginPage({ session }) {
   const [invitationCode, setInvitationCode] = useState("");
   const [error, setError] = useState("");
@@ -27,20 +38,34 @@ export default function LoginPage({ session }) {
 
   return (
     <div className="auth-screen">
-      <div className="auth-logo">[ˈskriː.boː]</div>
-      <section className="auth-panel">
-        <div>
-          <p className="eyebrow">Professor access</p>
-          <h1>{session ? "Invitation required" : "Sign in"}</h1>
-          <p className="muted-line">
-            {session
-              ? `Signed in as ${session.user.email}. Enter the professor invitation code once.`
-              : "Use your ChatGPT account to open the professor workspace."}
-          </p>
+      <main className="auth-main">
+        <div className="auth-logo">[ˈskriː.boː]</div>
+        <div className="auth-intro">
+          <h1>Evidence for thoughtful feedback.</h1>
+          <button className="auth-tutorial-button" type="button">
+            Watch tutorial
+          </button>
         </div>
+        <div className="auth-features" aria-label="Scribo features">
+          {FEATURES.map(([title, description]) => (
+            <section className="auth-feature" key={title}>
+              <h2>{title}</h2>
+              <p>{description}</p>
+            </section>
+          ))}
+        </div>
+      </main>
+
+      <aside className="auth-panel">
+        <h2>{session ? "Invitation required" : "Sign in"}</h2>
+        <p className="auth-description">
+          {session
+            ? `Signed in as ${session.user.email}. Enter the professor invitation code once.`
+            : "Open your classes, essay folders, submissions, and responses."}
+        </p>
 
         {session ? (
-          <form className="stack-form" onSubmit={handleActivation}>
+          <form className="auth-invitation-form" onSubmit={handleActivation}>
             <label>
               <span>Invitation code</span>
               <input
@@ -48,21 +73,26 @@ export default function LoginPage({ session }) {
                 value={invitationCode}
                 onChange={(event) => setInvitationCode(event.target.value)}
                 placeholder="Invitation code"
-                autoComplete="off"
+                autoComplete="one-time-code"
                 required
               />
             </label>
             <ErrorState message={error} />
-            <button className="primary-button" type="submit" disabled={loading}>
+            <button className="auth-submit-button" type="submit" disabled={loading}>
               {loading ? "Checking" : "Open professor workspace"}
             </button>
           </form>
         ) : (
-          <a className="primary-button auth-signin-link" href="/signin-with-chatgpt?return_to=/login" target="_top">
+          <a className="auth-signin-link" href="/signin-with-chatgpt?return_to=/login" target="_top">
             Continue with ChatGPT
           </a>
         )}
-      </section>
+        {!session && (
+          <p className="auth-privacy">
+            Professor access only. Student writing links remain open without a professor account.
+          </p>
+        )}
+      </aside>
     </div>
   );
 }
