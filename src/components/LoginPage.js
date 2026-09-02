@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navigate } from "react-router-dom";
 
 import { activateProfessor } from "../sites/auth";
@@ -14,6 +14,49 @@ const FEATURES = [
     "Trace active and idle time, typing pace, pauses, revisions, deletions, and paste events.",
   ],
 ];
+
+const MOTTO = "Evidence for thoughtful feedback.";
+
+function TypewriterMotto() {
+  const textRef = useRef(null);
+
+  useEffect(() => {
+    const textNode = textRef.current;
+    if (!textNode) return undefined;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      textNode.textContent = MOTTO;
+      return undefined;
+    }
+
+    let characterIndex = 0;
+    let typingTimer;
+    const startTimer = window.setTimeout(() => {
+      typingTimer = window.setInterval(() => {
+        characterIndex += 1;
+        textNode.textContent = MOTTO.slice(0, characterIndex);
+        if (characterIndex >= MOTTO.length) window.clearInterval(typingTimer);
+      }, 65);
+    }, 350);
+
+    return () => {
+      window.clearTimeout(startTimer);
+      window.clearInterval(typingTimer);
+    };
+  }, []);
+
+  return (
+    <h1 className="auth-motto" aria-label={MOTTO}>
+      <span className="auth-motto-reserve" aria-hidden="true">
+        {MOTTO}
+      </span>
+      <span className="auth-motto-typed" aria-hidden="true">
+        <span ref={textRef} />
+        <span className="auth-motto-caret" />
+      </span>
+    </h1>
+  );
+}
 
 export default function LoginPage({ session }) {
   const [invitationCode, setInvitationCode] = useState("");
@@ -41,7 +84,7 @@ export default function LoginPage({ session }) {
       <main className="auth-main">
         <div className="auth-logo">[ˈskriː.boː]</div>
         <div className="auth-intro">
-          <h1>Evidence for thoughtful feedback.</h1>
+          <TypewriterMotto />
           <button className="auth-tutorial-button" type="button">
             Watch tutorial
           </button>

@@ -1161,6 +1161,42 @@ button:disabled {
   letter-spacing: 0;
 }
 
+.auth-motto {
+  position: relative;
+}
+
+.auth-motto-reserve {
+  visibility: hidden;
+}
+
+.auth-motto-typed {
+  position: absolute;
+  inset: 0;
+}
+
+.auth-motto-caret {
+  display: inline-block;
+  width: 0;
+  height: 0.78em;
+  margin-left: 0.04em;
+  border-right: 0.05em solid currentColor;
+  vertical-align: -0.05em;
+  animation: auth-caret 1s steps(1) infinite;
+}
+
+@keyframes auth-caret {
+  50% {
+    border-color: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-motto-caret {
+    border-right: 0;
+    animation: none;
+  }
+}
+
 .auth-tutorial-button,
 .auth-signin-link,
 .auth-submit-button {
@@ -1224,7 +1260,7 @@ button:disabled {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 54px;
+  padding: 78px 54px 30px;
   border-left: 1px solid var(--ink);
   background: #f3f3f1;
 }
