@@ -1162,45 +1162,26 @@ button:disabled {
 }
 
 .auth-motto-character {
-  position: relative;
   opacity: 0;
-  animation: auth-motto-character-reveal 1ms step-end forwards;
-  animation-delay: var(--auth-character-delay);
 }
 
-.auth-motto-character::after {
+.auth-motto-character-visible {
+  opacity: 1;
+}
+
+.auth-motto-character-current {
+  position: relative;
+}
+
+.auth-motto-character-current::after {
   position: absolute;
   top: 0.09em;
   right: -0.02em;
   height: 0.78em;
   border-right: 0.05em solid currentColor;
   content: "";
-  opacity: 0;
-  animation: auth-motto-caret-pass 65ms steps(1, end) forwards;
-  animation-delay: var(--auth-character-delay);
-  pointer-events: none;
-}
-
-.auth-motto-character-final::after {
   animation: auth-caret 1s steps(1) infinite;
-  animation-delay: var(--auth-character-delay);
-}
-
-@keyframes auth-motto-character-reveal {
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes auth-motto-caret-pass {
-  0%,
-  99% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
+  pointer-events: none;
 }
 
 @keyframes auth-caret {
@@ -1218,10 +1199,9 @@ button:disabled {
 @media (prefers-reduced-motion: reduce) {
   .auth-motto-character {
     opacity: 1;
-    animation: none;
   }
 
-  .auth-motto-character::after {
+  .auth-motto-character-current::after {
     display: none;
   }
 }

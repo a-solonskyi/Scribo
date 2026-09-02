@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
 import { activateProfessor } from "../sites/auth";
@@ -20,22 +20,53 @@ const TYPEWRITER_START_DELAY = 350;
 const TYPEWRITER_CHARACTER_DELAY = 65;
 
 function TypewriterMotto() {
+  const [visibleCharacterCount, setVisibleCharacterCount] = useState(0);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setVisibleCharacterCount(MOTTO.length);
+      return undefined;
+    }
+
+    let typingTimer;
+    const startTimer = window.setTimeout(() => {
+      setVisibleCharacterCount(1);
+      typingTimer = window.setInterval(() => {
+        setVisibleCharacterCount((currentCount) => {
+          if (currentCount >= MOTTO.length) {
+            window.clearInterval(typingTimer);
+            return currentCount;
+          }
+
+          return currentCount + 1;
+        });
+      }, TYPEWRITER_CHARACTER_DELAY);
+    }, TYPEWRITER_START_DELAY);
+
+    return () => {
+      window.clearTimeout(startTimer);
+      window.clearInterval(typingTimer);
+    };
+  }, []);
+
   return (
     <h1 className="auth-motto" aria-label={MOTTO}>
-      {[...MOTTO].map((character, index) => (
-        <span
-          className={`auth-motto-character${
-            index === MOTTO.length - 1 ? " auth-motto-character-final" : ""
-          }`}
-          key={`${character}-${index}`}
-          style={{
-            "--auth-character-delay": `${TYPEWRITER_START_DELAY + index * TYPEWRITER_CHARACTER_DELAY}ms`,
-          }}
-          aria-hidden="true"
-        >
-          {character}
-        </span>
-      ))}
+      {[...MOTTO].map((character, index) => {
+        const isVisible = index < visibleCharacterCount;
+        const isCurrent = index === visibleCharacterCount - 1;
+
+        return (
+          <span
+            className={`auth-motto-character${
+              isVisible ? " auth-motto-character-visible" : ""
+            }${isCurrent ? " auth-motto-character-current" : ""}`}
+            key={`${character}-${index}`}
+            aria-hidden="true"
+          >
+            {character}
+          </span>
+        );
+      })}
     </h1>
   );
 }
