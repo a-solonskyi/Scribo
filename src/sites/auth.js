@@ -22,3 +22,13 @@ export async function activateProfessor(invitationCode) {
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(data.error || "Unable to activate professor access.");
 }
+
+export async function verifyTutorialInvitationCode(invitationCode) {
+  const response = await fetch("/api/tutorial/access", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ invitationCode }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || "Unable to verify the invitation code.");
+}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
-import { activateProfessor } from "../sites/auth";
+import { activateProfessor, verifyTutorialInvitationCode } from "../sites/auth";
 import { ErrorState } from "./LoadingState";
 
 const FEATURES = [
@@ -16,6 +16,7 @@ const FEATURES = [
 ];
 
 const MOTTO = "Evidence for thoughtful feedback.";
+const TUTORIAL_URL = "https://youtu.be/fwI9-IQy-ZA";
 const TYPEWRITER_START_DELAY = 350;
 const TYPEWRITER_CHARACTER_DELAY = 65;
 
@@ -23,11 +24,6 @@ function TypewriterMotto() {
   const [visibleCharacterCount, setVisibleCharacterCount] = useState(0);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setVisibleCharacterCount(MOTTO.length);
-      return undefined;
-    }
-
     let typingTimer;
     const startTimer = window.setTimeout(() => {
       setVisibleCharacterCount(1);
@@ -51,7 +47,7 @@ function TypewriterMotto() {
 
   return (
     <h1 className="auth-motto" aria-label={MOTTO}>
-      {[...MOTTO].map((character, index) => {
+      {MOTTO.split("").map((character, index) => {
         const isVisible = index < visibleCharacterCount;
         const isCurrent = index === visibleCharacterCount - 1;
 
@@ -75,6 +71,21 @@ export default function LoginPage({ session }) {
   const [invitationCode, setInvitationCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [tutorialDialogOpen, setTutorialDialogOpen] = useState(false);
+  const [tutorialCode, setTutorialCode] = useState("");
+  const [tutorialError, setTutorialError] = useState("");
+  const [tutorialLoading, setTutorialLoading] = useState(false);
+
+  useEffect(() => {
+    if (!tutorialDialogOpen) return undefined;
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") setTutorialDialogOpen(false);
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [tutorialDialogOpen]);
 
   if (session?.approved) return <Navigate to="/dashboard" replace />;
 
@@ -92,13 +103,37 @@ export default function LoginPage({ session }) {
     }
   }
 
+  function openTutorialDialog() {
+    setTutorialCode("");
+    setTutorialError("");
+    setTutorialDialogOpen(true);
+  }
+
+  function closeTutorialDialog() {
+    if (tutorialLoading) return;
+    setTutorialDialogOpen(false);
+  }
+
+  async function handleTutorialAccess(event) {
+    event.preventDefault();
+    setTutorialError("");
+    setTutorialLoading(true);
+    try {
+      await verifyTutorialInvitationCode(tutorialCode);
+      window.location.assign(TUTORIAL_URL);
+    } catch (err) {
+      setTutorialError(err.message);
+      setTutorialLoading(false);
+    }
+  }
+
   return (
     <div className="auth-screen">
       <main className="auth-main">
         <div className="auth-logo">[ˈskriː.boː]</div>
         <div className="auth-intro">
           <TypewriterMotto />
-          <button className="auth-tutorial-button" type="button">
+          <button className="auth-tutorial-button" type="button" onClick={openTutorialDialog}>
             Watch tutorial
           </button>
         </div>
@@ -139,9 +174,9 @@ export default function LoginPage({ session }) {
             </button>
           </form>
         ) : (
-          <a className="auth-signin-link" href="/signin-with-chatgpt?return_to=/login" target="_top">
+          <Link className="auth-signin-link" to="/signin-with-chatgpt?return_to=/login" target="_top">
             Continue with ChatGPT
-          </a>
+          </Link>
         )}
         {!session && (
           <p className="auth-privacy">
@@ -149,6 +184,49 @@ export default function LoginPage({ session }) {
           </p>
         )}
       </aside>
+
+      {tutorialDialogOpen ? (
+        <dialog
+          className="modal-backdrop auth-tutorial-backdrop"
+          open
+          aria-labelledby="tutorial-dialog-title"
+          onCancel={(event) => {
+            event.preventDefault();
+            closeTutorialDialog();
+          }}
+        >
+          <section className="modal-panel auth-tutorial-dialog">
+            <header className="auth-tutorial-dialog-header">
+              <h2 id="tutorial-dialog-title">Watch tutorial</h2>
+              <button className="text-button" type="button" onClick={closeTutorialDialog}>
+                Close
+              </button>
+            </header>
+            <p>Enter the invitation code to open the Scribo tutorial.</p>
+            <form className="auth-tutorial-form" onSubmit={handleTutorialAccess}>
+              <label>
+                <span>Invitation code</span>
+                <input
+                  type="password"
+                  value={tutorialCode}
+                  onChange={(event) => {
+                    setTutorialCode(event.target.value);
+                    setTutorialError("");
+                  }}
+                  placeholder="Invitation code"
+                  autoComplete="one-time-code"
+                  autoFocus
+                  required
+                />
+              </label>
+              {tutorialError ? <p className="auth-tutorial-error">{tutorialError}</p> : null}
+              <button className="auth-submit-button" type="submit" disabled={tutorialLoading}>
+                {tutorialLoading ? "Checking" : "Open tutorial"}
+              </button>
+            </form>
+          </section>
+        </dialog>
+      ) : null}
     </div>
   );
 }

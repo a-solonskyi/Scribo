@@ -1233,6 +1233,86 @@ button:disabled {
   background: #eeeeeb;
 }
 
+.auth-tutorial-backdrop {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.auth-tutorial-dialog {
+  width: min(430px, 100%);
+  padding: 24px;
+}
+
+.auth-tutorial-dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--ink);
+}
+
+.auth-tutorial-dialog-header h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.auth-tutorial-dialog > p {
+  margin: 18px 0 0;
+  color: var(--medium-gray);
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+.auth-tutorial-form {
+  display: grid;
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.auth-tutorial-form label {
+  display: grid;
+  gap: 10px;
+}
+
+.auth-tutorial-form label span {
+  color: var(--medium-gray);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.auth-tutorial-form input {
+  width: 100%;
+  padding: 0 0 10px;
+  border: 0;
+  border-bottom: 1px solid var(--medium-gray);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  outline: none;
+}
+
+.auth-tutorial-form .auth-submit-button {
+  margin-top: 0;
+}
+
+.auth-tutorial-error {
+  margin: 0;
+  color: #8a3a31;
+  font-size: 13px;
+}
+
 .auth-features {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
