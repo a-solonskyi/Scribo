@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Pause, Play, RotateCcw, SkipForward } from "lucide-react";
+import { Pause, Play, SkipForward } from "lucide-react";
 
 import { getReplayDuration } from "../utils/replayEngine";
 import { formatDuration } from "../utils/timeFormatting";
@@ -111,10 +111,10 @@ export default function ReplayPlayer({
           className="replay-icon-button"
           type="button"
           onClick={reset}
-          aria-label="Reset replay"
-          title="Reset"
+          aria-label="Rewind replay to start"
+          title="Rewind to start"
         >
-          <RotateCcw aria-hidden="true" />
+          <SkipForward className="replay-rewind-icon" aria-hidden="true" />
         </button>
         <button
           className="replay-icon-button"

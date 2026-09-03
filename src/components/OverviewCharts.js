@@ -1,5 +1,5 @@
 import { getReplayDuration } from "../utils/replayEngine";
-import { formatDuration, formatNumber } from "../utils/timeFormatting";
+import { formatNumber } from "../utils/timeFormatting";
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -145,8 +145,7 @@ function CharacterTimeLine({ eventLog, stats }) {
   return (
     <section className="overview-chart-card">
       <div className="chart-heading">
-        <h2>Characters over time</h2>
-        <span>{formatDuration(durationMs)}</span>
+        <h2>Characters over total time</h2>
       </div>
       <svg
         className="overview-line-chart"
@@ -156,8 +155,6 @@ function CharacterTimeLine({ eventLog, stats }) {
       >
         <text x="0" y="28" className="axis-label">Characters</text>
         <text x="350" y="278" className="axis-label">Time</text>
-        <text x="8" y="60" className="axis-value">{formatNumber(maxCharacters)}</text>
-        <text x="28" y="274" className="axis-value">0</text>
         <line x1="38" y1="44" x2="38" y2="256" className="axis-line" />
         <line x1="38" y1="256" x2="402" y2="256" className="axis-line" />
         <line x1="38" y1="256" x2="402" y2="44" className="reference-line" />

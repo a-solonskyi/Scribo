@@ -52,6 +52,7 @@ export default function ProcessMetrics({
 }) {
   const firstEventMs = stats.firstEventAtMs;
   const lastEventMs = stats.lastEventAtMs;
+  const deviceInfo = stats.deviceInfo || stats.device_info || {};
 
   if (mode === "technical") {
     return (
@@ -88,6 +89,14 @@ export default function ProcessMetrics({
           <MetricTable rows={[
             ["Submission ID", submission.id],
             ["Assignment ID", submission.assignment_id],
+            ["Device IP", deviceInfo.ip || "Not recorded"],
+            ["Device Country", deviceInfo.country || "Not recorded"],
+            [
+              "Operating system",
+              deviceInfo.operatingSystem ||
+                deviceInfo.operating_system ||
+                "Not recorded",
+            ],
           ]} />
         </details>
       </div>

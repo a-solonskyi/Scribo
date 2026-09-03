@@ -65,6 +65,7 @@ export function serializeSubmission(
           assignments: {
             topic: assignment.topic,
             instructions: assignment.instructions,
+            deadline: assignment.deadline,
             professor_id: assignment.professorId,
             class_id: assignment.classId,
           },

@@ -1,56 +1,14 @@
 import { useMemo } from "react";
 
-import { replayUntil, getReplayDuration } from "../utils/replayEngine";
+import { getReplayDuration } from "../utils/replayEngine";
 import { getActivityBuckets } from "../utils/writingAnalytics";
 import { formatDuration } from "../utils/timeFormatting";
-import { getTextStats } from "../utils/textStats";
 
 function getAdaptiveBucketMs(durationMs) {
   if (durationMs <= 3 * 60 * 1000) return 2000;
   if (durationMs <= 15 * 60 * 1000) return 5000;
   if (durationMs <= 45 * 60 * 1000) return 15000;
   return 30000;
-}
-
-function getWordCurvePoints(eventLog, durationMs, bucketMs, activeEndMs) {
-  const endMs = Math.max(bucketMs, durationMs || bucketMs);
-  const points = [];
-
-  for (let timeMs = 0; timeMs <= endMs; timeMs += bucketMs) {
-    const visibleTime = Math.min(timeMs, activeEndMs);
-    const replay = replayUntil(eventLog, visibleTime);
-    points.push({
-      timeMs,
-      words: timeMs <= activeEndMs ? getTextStats(replay.text).wordCount : null,
-    });
-  }
-
-  const lastReplay = replayUntil(eventLog, activeEndMs);
-  points.push({
-    timeMs: activeEndMs,
-    words: getTextStats(lastReplay.text).wordCount,
-  });
-
-  return points;
-}
-
-function getCurvePath(points, maxWords, totalMs) {
-  const x0 = 52;
-  const x1 = 908;
-  const y0 = 36;
-  const y1 = 206;
-  const validPoints = points.filter((point) => point.words !== null);
-  const maxTime = Math.max(1, totalMs || points[points.length - 1]?.timeMs || 1);
-
-  if (!validPoints.length) return "";
-
-  return validPoints
-    .map((point, index) => {
-      const x = x0 + (point.timeMs / maxTime) * (x1 - x0);
-      const y = y1 - (point.words / maxWords) * (y1 - y0);
-      return `${index === 0 ? "M" : "L"} ${x} ${y}`;
-    })
-    .join(" ");
 }
 
 function ActivityRow({ label, meta, tone, items, durationMs }) {
@@ -130,22 +88,9 @@ export default function ActivityTimeline({
     (sum, bucket) => sum + bucket.pastedCharacters,
     0
   );
-  const curvePoints = getWordCurvePoints(eventLog, durationMs, bucketMs, activeEndMs);
-  const maxWords = Math.max(1, ...curvePoints.map((point) => point.words || 0));
-  const curvePath = getCurvePath(curvePoints, maxWords, durationMs);
-  const lastPoint = curvePoints.filter((point) => point.words !== null).at(-1);
-  const lastPointX = lastPoint
-    ? 52 + (lastPoint.timeMs / Math.max(1, durationMs)) * (908 - 52)
-    : 52;
-  const lastPointY = lastPoint
-    ? 206 - ((lastPoint.words || 0) / maxWords) * (206 - 36)
-    : 206;
   const activePasteEvents = pasteEvents.filter(
     (event) => !interactive || (event.timestamp_ms || 0) <= activeEndMs
   );
-  const activePauseEvents = visiblePauses;
-  const getCurveX = (timeMs) =>
-    52 + (Math.min(timeMs, durationMs) / Math.max(1, durationMs)) * (908 - 52);
   const playheadRatio = activeEndMs / durationMs;
   const playheadLeft = `calc(220px + ${playheadRatio * 100}% - ${
     playheadRatio * 220
@@ -196,55 +141,6 @@ export default function ActivityTimeline({
 
   return (
     <div className="activity-visualization">
-      <section className="word-curve-card" aria-label="Word production curve">
-        <h3>Essay growth over time</h3>
-        <div className="word-curve-wrap">
-          <svg viewBox="0 0 960 250" role="img" aria-label="Words over time">
-            <text x="8" y="24" className="axis-label">Words</text>
-            <text x="60" y="222" className="axis-label">0s</text>
-            <text x="820" y="222" className="axis-label">
-              Time: {formatDuration(activeEndMs)}
-            </text>
-            <text x="20" y="72" className="axis-value">{maxWords}</text>
-            <line x1="52" y1="36" x2="52" y2="206" className="axis-line" />
-            <line x1="52" y1="206" x2="908" y2="206" className="axis-line" />
-            {activePauseEvents.map((pause, index) => (
-              <rect
-                className="curve-pause-band"
-                key={`curve-pause-${index}`}
-                x={getCurveX(pause.start_ms || 0)}
-                y="36"
-                width={Math.max(
-                  4,
-                  getCurveX(pause.end_ms || pause.start_ms || 0) -
-                    getCurveX(pause.start_ms || 0)
-                )}
-                height="170"
-              />
-            ))}
-            {curvePath ? <path d={curvePath} className="word-curve-line" /> : null}
-            {activePasteEvents.map((event, index) => (
-              <line
-                className="curve-paste-marker"
-                key={`curve-paste-${index}`}
-                x1={getCurveX(event.timestamp_ms || 0)}
-                x2={getCurveX(event.timestamp_ms || 0)}
-                y1="36"
-                y2="206"
-              />
-            ))}
-            {lastPoint ? (
-              <circle
-                cx={lastPointX}
-                cy={lastPointY}
-                r="6"
-                className="word-curve-dot"
-              />
-            ) : null}
-          </svg>
-        </div>
-      </section>
-
       <section className="activity-timeline-card" aria-label="Writing activity timeline">
         <h3>Activity by time interval</h3>
         <p>

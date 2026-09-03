@@ -1437,13 +1437,15 @@ button:disabled {
 }
 
 .stat-card {
+  position: relative;
   display: grid;
   gap: 8px;
   padding: 14px;
   background: var(--canvas);
 }
 
-.stat-card span {
+.stat-card > span {
+  padding-right: 28px;
   color: var(--medium-gray);
   font-size: 11px;
   letter-spacing: 0.08em;
@@ -1453,6 +1455,172 @@ button:disabled {
 .stat-card strong {
   font-size: 22px;
   font-weight: 400;
+}
+
+.stat-info-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-grid;
+  width: 19px;
+  height: 19px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--canvas);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stat-info-button:hover,
+.stat-info-button:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.stat-info-popover {
+  position: absolute;
+  top: 38px;
+  right: 10px;
+  z-index: 12;
+  width: min(330px, calc(100vw - 56px));
+  margin: 0;
+  padding: 18px;
+  border: 1px solid var(--ink);
+  background: var(--canvas);
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.12);
+  color: var(--ink);
+}
+
+.stat-card:nth-child(4n + 1) .stat-info-popover {
+  right: auto;
+  left: 10px;
+}
+
+.stat-info-popover h3 {
+  margin: 0 28px 14px 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.stat-info-popover p {
+  margin: 0 0 12px;
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.48;
+}
+
+.stat-info-popover p > strong {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.stat-info-close {
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+}
+
+.stat-info-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+.wpm-reference {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--light-gray);
+}
+
+.wpm-reference-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.wpm-reference-heading span,
+.wpm-reference-heading strong {
+  color: var(--ink);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.wpm-reference-heading strong {
+  font-weight: 700;
+}
+
+.wpm-histogram {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: end;
+  gap: 3px;
+  height: 74px;
+  margin: 0;
+  border-bottom: 1px solid var(--ink);
+}
+
+.wpm-histogram-bar {
+  display: block;
+  min-height: 3px;
+  background: #c8c8c8;
+}
+
+.wpm-writer-marker {
+  position: absolute;
+  top: 0;
+  bottom: -4px;
+  z-index: 2;
+  width: 4px;
+  border-left: 4px dashed var(--ink);
+  transform: translateX(-2px);
+}
+
+.wpm-histogram-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  color: var(--medium-gray);
+  font-size: 9px;
+}
+
+.wpm-histogram-axis span {
+  color: inherit;
+  font-size: inherit;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.stat-info-popover .wpm-reference-note {
+  margin: 10px 0 0;
+  color: var(--medium-gray);
+  font-size: 10px;
+}
+
+.wpm-reference-note a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .overview-charts {
@@ -1687,6 +1855,45 @@ button:disabled {
   margin: 0 0 14px;
   font-size: 22px;
   font-weight: 400;
+}
+
+.ai-prompt-panel {
+  display: grid;
+}
+
+.ai-prompt-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 32px;
+  padding: 6px 0 22px;
+  border-bottom: 1px solid var(--light-gray);
+}
+
+.ai-prompt-intro h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.ai-prompt-intro p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--medium-gray);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.ai-prompt-intro .ai-prompt-note {
+  max-width: 680px;
+  margin-top: 10px;
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.ai-prompt-button {
+  min-width: 184px;
+  white-space: nowrap;
 }
 
 .essay-display,
@@ -2253,6 +2460,11 @@ button:disabled {
   fill: currentColor;
 }
 
+.replay-icon-button svg.replay-rewind-icon {
+  transform: scaleX(-1);
+  transform-origin: center;
+}
+
 .replay-scrubber {
   position: relative;
   min-height: 58px;
@@ -2362,6 +2574,17 @@ button:disabled {
   .overview-charts,
   .response-layout {
     grid-template-columns: 1fr;
+  }
+
+  .ai-prompt-intro {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .stat-card .stat-info-popover {
+    right: 10px;
+    left: 10px;
+    width: auto;
   }
 
   .page-header,

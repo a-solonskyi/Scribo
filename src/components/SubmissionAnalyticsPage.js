@@ -10,6 +10,7 @@ import { getPasteRangesForText } from "../utils/pasteHighlighting";
 import { replayUntil } from "../utils/replayEngine";
 import { formatDateTime } from "../utils/timeFormatting";
 import ActivityTimeline from "./ActivityTimeline";
+import AIPromptTab from "./AIPromptTab";
 import HighlightedEssayText from "./HighlightedEssayText";
 import { ErrorState, LoadingState } from "./LoadingState";
 import OverviewCharts from "./OverviewCharts";
@@ -53,7 +54,7 @@ export default function SubmissionAnalyticsPage({ session }) {
       }
     }
 
-    load();
+    void load();
   }, [submissionId]);
 
   if (loading) return <LoadingState label="Loading submission" />;
@@ -113,6 +114,7 @@ export default function SubmissionAnalyticsPage({ session }) {
     ["response", "Response"],
     ["events", "Events"],
     ["technical", "Technical details"],
+    ["ai-prompt", "AI prompt"],
   ];
 
   return (
@@ -228,6 +230,16 @@ export default function SubmissionAnalyticsPage({ session }) {
           mode="technical"
           eventLog={eventLog}
           pasteEvents={pasteEvents}
+        />
+      ) : null}
+
+      {activeTab === "ai-prompt" ? (
+        <AIPromptTab
+          submission={submission}
+          stats={displayStats}
+          eventLog={eventLog}
+          pasteEvents={pasteEvents}
+          pauseEvents={pauseEvents}
         />
       ) : null}
     </section>
