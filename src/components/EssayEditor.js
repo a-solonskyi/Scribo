@@ -87,6 +87,7 @@ export default function EssayEditor({
   essayHtml,
   onEssayChange,
   onPaste,
+  editable = true,
 }) {
   const editor = useEditor(
     {
@@ -138,9 +139,11 @@ export default function EssayEditor({
     if (!editor) return;
     const nextHtml = essayHtml || "";
     if (editor.getHTML() !== nextHtml) {
-      editor.commands.setContent(nextHtml, false);
+      editor.commands.setContent(nextHtml, { emitUpdate: false });
     }
   }, [editor, essayHtml]);
+
+  useEffect(() => { editor?.setEditable(editable); }, [editor, editable]);
 
   return (
     <section className="editor-panel" aria-label="Essay editor">

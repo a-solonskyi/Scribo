@@ -8,6 +8,13 @@
       "when": 1788259685846,
       "tag": "0000_mysterious_garia",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1788871494511,
+      "tag": "0001_burly_swordsman",
+      "breakpoints": true
     }
   ]
 }
