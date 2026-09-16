@@ -1,0 +1,29 @@
+.wine-close:focus-visible {
+  outline: 1px solid #000;
+  outline-offset: 6px;
+}
+.is-transformed .deadline-field-text { animation: deadline-into-ink 650ms ease-in forwards; }
+.deadline-wine { position: fixed; z-index: 30; pointer-events: none; }
+.wine-scene { display: block; width: 100%; height: 100%; overflow: visible; }
+.wine-bottle { transition: fill 500ms; }
+.wine-bottle-detail { opacity: 0; transition: opacity 500ms; }
+.is-pouring .wine-bottle-detail { opacity: 1; }
+.wine-pour { opacity: 0; transition: opacity 550ms; }
+.is-pouring .wine-pour { opacity: 1; }
+.wine-glass { opacity: 0; transform: translateY(26px); transition: opacity 900ms, transform 1100ms cubic-bezier(.2,.65,.2,1); }
+.is-pouring .wine-glass { opacity: 1; transform: translateY(0); }
+.wine-stream-glint { animation: wine-flow 2600ms linear infinite; }
+.wine-overflow-trace { animation: wine-flow 2100ms linear infinite; }
+.wine-close { position: absolute; top: 0; right: 0; width: 28px; height: 28px; padding: 0; border: 0; background: #fff; color: #777; font-size: 20px; font-weight: 300; pointer-events: auto; opacity: 0; transition: opacity 300ms; }
+.is-pouring .wine-close { opacity: 1; }
+.wine-close:hover { color: #000; }
+@keyframes deadline-into-ink {
+  0% { opacity: 1; filter: blur(0); transform: scaleY(1); }
+  55% { opacity: .45; filter: blur(3px); transform: scaleY(.7); }
+  100% { opacity: 0; filter: blur(7px); transform: scaleY(.12); }
+}
+@keyframes wine-flow { to { stroke-dashoffset: -164; } }
+@media (prefers-reduced-motion: reduce) {
+  .is-transformed .deadline-field-text { animation: none; opacity: 0; }
+  .deadline-wine *, .deadline-wine-trigger { animation: none !important; transition: none !important; }
+}

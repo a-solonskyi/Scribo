@@ -1,0 +1,8 @@
+.deadline-ink-canvas { position: absolute; top: 0; pointer-events: none; }
+.deadline-wine-trigger.liquid-trigger.is-transformed .deadline-field-text { animation: none; opacity: 1; }
+.deadline-wine-trigger.liquid-trigger.ink-captured .deadline-field-text { opacity: 0; }
+.liquid-deadline-wine .wine-close { transition: opacity 300ms; }
+.liquid-deadline-wine[data-phase="pouring"] .wine-close { opacity: 1; }
+.liquid-deadline-wine .wine-scene { position: relative; }
+.liquid-deadline-wine .liquid-stream { will-change: d; }
+.wine-contained { z-index: 2; }

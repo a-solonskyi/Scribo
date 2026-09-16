@@ -369,7 +369,7 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
   return (
     <div className={`student-writing-layout${assignment?.deadline ? " has-deadline" : ""}`}>
       {assignment?.deadline ? <aside className="student-deadline-rail" aria-label="Essay deadline">
-        <AssignmentDeadline deadline={assignment.deadline} />
+        <AssignmentDeadline deadline={assignment.deadline} startedAt={assignment.created_at} variant="liquid" />
       </aside> : null}
     <form className="student-shell" onSubmit={handleSubmit}>
       <div className="student-header">
