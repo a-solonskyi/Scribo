@@ -3,6 +3,14 @@ import { formatDateTime } from "../utils/timeFormatting";
 import { formatTimeLeft } from "../utils/deadlines";
 import "./assignment-deadline.css";
 
+// Separate import factories keep each renderer's CSS attached to its own chunk.
+// A conditional import expression can make the production preloader use only
+// the final branch's stylesheet list.
+const loadAnimation = {
+  liquid: () => import("./LiquidDeadlineWine"),
+  original: () => import("./DeadlineWine"),
+};
+
 export default function AssignmentDeadline({ deadline, startedAt, variant, progressOverride, displayNow, contained = false, initiallyOpen = false, motionRate = 1 }) {
   const [now, setNow] = useState(Date.now);
   const [open, setOpen] = useState(initiallyOpen);
@@ -20,8 +28,7 @@ export default function AssignmentDeadline({ deadline, startedAt, variant, progr
     if (!open || !variant || Animation) return;
     let cancelled = false;
     // Keep both the renderer and its styles out of the initial page load.
-    const module = isLiquid ? import("./LiquidDeadlineWine") : import("./DeadlineWine");
-    module.then(({ default: Component }) => {
+    loadAnimation[kind]().then(({ default: Component }) => {
       if (!cancelled) setLoaded({ kind, Component });
     }).catch(() => {
       if (!cancelled) {
