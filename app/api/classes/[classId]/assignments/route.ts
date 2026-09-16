@@ -3,6 +3,8 @@ import { getDb } from "@/db";
 import { assignments, submissions } from "@/db/schema";
 import { errorResponse, getOwnedClass, readJsonObject, serializeAssignment, stringValue } from "@/lib/server/data";
 import { requireApprovedProfessor } from "@/lib/server/professor";
+import { normalizeDeadline } from "@/src/utils/deadlines";
+import { normalizeInstructions } from "@/src/utils/assignmentInstructions";
 
 type Context = { params: Promise<{ classId: string }> };
 
@@ -35,18 +37,23 @@ export async function POST(request: Request, { params }: Context) {
   const body = await readJsonObject(request);
   const topic = stringValue(body.topic).trim();
   if (!topic) return errorResponse("Essay topic is required.");
-  const deadlineValue = stringValue(body.deadline);
-  const deadline = deadlineValue ? new Date(deadlineValue) : null;
-  if (deadline && Number.isNaN(deadline.getTime())) return errorResponse("Deadline is invalid.");
+  let deadline: string | null;
+  let instructions: string | null;
+  try {
+    deadline = normalizeDeadline(body.deadline);
+    instructions = normalizeInstructions(body.instructions);
+  } catch (error) {
+    return errorResponse(error instanceof Error ? error.message : "Essay details are invalid.");
+  }
 
   const row = {
     id: crypto.randomUUID(),
     classId,
     professorId: professor.userId,
     topic: topic.slice(0, 240),
-    instructions: stringValue(body.instructions).trim().slice(0, 5000) || null,
+    instructions,
     publicToken: crypto.randomUUID().replaceAll("-", "").slice(0, 16),
-    deadline: deadline?.toISOString() ?? null,
+    deadline,
     createdAt: new Date().toISOString(),
   };
   await getDb().insert(assignments).values(row);

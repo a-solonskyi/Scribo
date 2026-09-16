@@ -1438,31 +1438,126 @@ button:disabled {
 }
 
 .student-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 32px;
+  gap: 24px 28px;
   margin-bottom: 32px;
   padding-bottom: 24px;
   border-bottom: 1px solid var(--ink);
 }
 
-.student-submit-button {
-  align-self: flex-start;
+.student-header.has-deadline {
+  grid-template-columns: minmax(150px, 190px) minmax(0, 1fr) max-content;
+}
+
+.student-header > h1 {
   min-width: 0;
-  min-height: 0;
-  padding: 8px 12px;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.student-header > .assignment-instructions {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.assignment-deadline {
+  min-width: 0;
+  padding-top: 4px;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.deadline-label {
+  display: block;
+  margin-bottom: 6px;
+  color: #666;
+}
+
+.assignment-instructions {
+  min-width: 0;
+  margin-top: 20px;
+  font-size: 1rem;
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: #666;
+  overflow-wrap: anywhere;
+}
+
+.instructions-preview.is-collapsed {
+  max-height: 7.5em;
+  overflow: hidden;
+}
+
+.instructions-content {
+  display: flow-root;
+  line-height: 1.5;
+}
+
+.instructions-content p,
+.student-entry .instructions-content p {
+  margin: 0 0 0.75em;
+  color: inherit;
+  font: inherit;
+}
+
+.instructions-content > :last-child {
+  margin-bottom: 0;
+}
+
+.instructions-plain-text {
+  white-space: pre-wrap;
+}
+
+.instructions-content h2,
+.instructions-content h3,
+.instructions-content h4 {
+  margin: 0.75em 0 0.4em;
+  color: var(--ink);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.instructions-content h2 { font-size: 1.5em; }
+.instructions-content h3 { font-size: 1.25em; }
+.instructions-content h4 { font-size: 1.1em; }
+.instructions-content > :first-child { margin-top: 0; }
+.instructions-toggle { margin-top: 12px; }
+
+.student-submit-button {
+  flex-shrink: 0;
+  align-self: flex-start;
+  min-width: 88px;
+  min-height: 40px;
+  padding: 10px 14px;
   line-height: 1.19;
   white-space: nowrap;
 }
 
 .student-name-field {
-  max-width: 420px;
+  max-width: 480px;
   margin-bottom: 32px;
 }
 
 .student-name-field input {
   border-bottom: 0;
+  color: #666;
+  font-style: italic;
+  font-size: 0.875rem;
+}
+
+.student-name-field input::placeholder {
+  color: #666;
+  font-style: italic;
+  opacity: 1;
+}
+
+.student-name-field input:focus-visible {
+  outline: 1px solid var(--medium-gray);
+  outline-offset: 4px;
 }
 
 .student-shell .essay-main {
@@ -1603,9 +1698,86 @@ button:disabled {
 
 .modal-panel {
   width: min(680px, 100%);
+  max-height: calc(100dvh - 56px);
+  overflow-y: auto;
   padding: 28px;
   border: 1px solid var(--ink);
   background: var(--canvas);
+}
+
+.instructions-field {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.instructions-field-label {
+  color: var(--medium-gray);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.instructions-editor {
+  border: 1px solid var(--light-gray);
+}
+
+.instructions-editor:focus-within {
+  border-color: var(--medium-gray);
+}
+
+.instructions-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  border-bottom: 1px solid var(--light-gray);
+}
+
+.instructions-toolbar select,
+.instructions-toolbar button {
+  min-height: 36px;
+  min-width: 36px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font: inherit;
+}
+
+.instructions-toolbar button[aria-pressed="true"] {
+  background: var(--selection);
+  border-color: var(--medium-gray);
+}
+
+.instructions-editor-content {
+  min-height: 150px;
+  max-height: 280px;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  padding: 12px;
+  outline: none;
+  font-size: 1rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.instructions-editor-content p { margin: 0 0 0.75em; }
+.instructions-editor-content > :last-child { margin-bottom: 0; }
+.instructions-editor-content h1 { font-size: 1.5em; }
+.instructions-editor-content h2 { font-size: 1.25em; }
+.instructions-editor-content h3 { font-size: 1.1em; }
+.instructions-editor-content h1,
+.instructions-editor-content h2,
+.instructions-editor-content h3 { margin: 0 0 0.5em; line-height: 1.3; }
+.instructions-editor-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--medium-gray);
+  pointer-events: none;
 }
 
 .stats-grid {
@@ -2769,9 +2941,18 @@ button:disabled {
   }
 
   .page-header,
-  .student-header,
   .share-box {
     display: block;
+  }
+
+  .student-header,
+  .student-header.has-deadline {
+    grid-template-columns: minmax(0, 1fr) max-content;
+    gap: 20px 16px;
+  }
+
+  .student-header > .assignment-deadline {
+    grid-column: 1 / -1;
   }
 
   .auth-screen {

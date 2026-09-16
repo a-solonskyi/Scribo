@@ -2,6 +2,9 @@ import { useState } from "react";
 
 import { createAssignment } from "../sites/database";
 import { ErrorState } from "./LoadingState";
+import InstructionsEditor from "./InstructionsEditor";
+import { normalizeInstructions } from "../utils/assignmentInstructions";
+import { localDeadlineToIso } from "../utils/deadlines";
 
 export default function AssignmentCreateModal({
   classId,
@@ -26,8 +29,8 @@ export default function AssignmentCreateModal({
         classId,
         professorId,
         topic: topic.trim(),
-        instructions: instructions.trim(),
-        deadline: deadline || null,
+        instructions: normalizeInstructions(instructions),
+        deadline: localDeadlineToIso(deadline),
       });
       onCreated(created);
     } catch (err) {
@@ -56,15 +59,10 @@ export default function AssignmentCreateModal({
               required
             />
           </label>
-          <label>
-            <span>Instructions</span>
-            <textarea
-              value={instructions}
-              onChange={(event) => setInstructions(event.target.value)}
-              placeholder="Optional instructions"
-              rows={5}
-            />
-          </label>
+          <div className="instructions-field">
+            <span className="instructions-field-label">Instructions</span>
+            <InstructionsEditor onChange={setInstructions} disabled={saving} />
+          </div>
           <label>
             <span>Deadline</span>
             <input

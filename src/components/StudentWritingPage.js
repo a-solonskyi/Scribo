@@ -23,6 +23,8 @@ import {
   maybeCreatePause,
 } from "../utils/writingAnalytics";
 import EssayEditor from "./EssayEditor";
+import AssignmentDeadline from "./AssignmentDeadline";
+import AssignmentInstructions from "./AssignmentInstructions";
 import { ErrorState, LoadingState } from "./LoadingState";
 
 const guestExplanation = "Your draft is saved automatically after each change in this browser’s local storage on this device. It usually survives closing the tab or restarting the browser. It can be lost if you clear this site’s data, use private browsing, change browser or device, or your browser removes stored data.";
@@ -88,7 +90,7 @@ function StudentDraftLoader({ publicToken }) {
     <main className="student-shell narrow student-entry">
       <p className="eyebrow">Skribo Essay</p>
       <h1>{assignment.topic}</h1>
-      {assignment.instructions ? <p className="student-entry-instructions">{assignment.instructions}</p> : null}
+      <AssignmentInstructions instructions={assignment.instructions} collapsible />
       <h2>{conflict ? "Choose the draft to continue" : "How would you like to save your progress?"}</h2>
       {conflict ? <>
         <p>There is a different draft in your account and in this browser. Choose one to continue. Download the browser copy first if you need to keep both.</p>
@@ -366,20 +368,18 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
 
   return (
     <form className="student-shell" onSubmit={handleSubmit}>
-      <div className="student-header">
-        <div>
-          <h1>{assignment?.topic}</h1>
-          {assignment?.instructions ? <p>{assignment.instructions}</p> : null}
-        </div>
+      <div className={`student-header${assignment?.deadline ? " has-deadline" : ""}`}>
+        <AssignmentDeadline deadline={assignment?.deadline} />
+        <h1>{assignment?.topic}</h1>
         <button className="filled-button student-submit-button" type="submit" disabled={saving}>
           {saving ? "Submitting" : "Submit"}
         </button>
+        <AssignmentInstructions instructions={assignment?.instructions} collapsible />
       </div>
 
       <div className="student-save-bar">
         <div>
           <output className="student-save-status" aria-live="polite">{autosave.message}</output>
-          {account ? <p className="student-storage-note">{account.user.displayName} · Progress is saved for this essay.</p> : null}
         </div>
         <div className="student-save-actions">
           <button className="draft-text-button" type="button" onClick={() => downloadEssay(assignment, draft)}>Download a copy</button>
@@ -411,11 +411,12 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
 
       <fieldset className="student-writing-fields" disabled={saving}>
       <label className="student-name-field">
-        <span>Name</span>
         <input
           value={studentName}
           onChange={(event) => setStudentName(event.target.value)}
-          placeholder="Name Surname"
+          aria-label="Name and Surname"
+          autoComplete="name"
+          placeholder="Please, write your Name and Surname in here"
           maxLength={180}
           required
         />
