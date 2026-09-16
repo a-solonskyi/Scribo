@@ -707,16 +707,29 @@ button:disabled {
   margin-top: auto;
 }
 
+.sidebar-account {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
 .sidebar-email {
-  margin: 2px 0 0;
+  min-width: 0;
+  margin: 0;
   color: var(--medium-gray);
   font-size: 11px;
   overflow-wrap: anywhere;
 }
 
 .sidebar-logout-button {
-  width: fit-content;
-  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  padding: 6px;
   border: 0;
   background: transparent;
   color: var(--medium-gray);
@@ -728,6 +741,11 @@ button:disabled {
 
 .sidebar-logout-button:hover {
   color: var(--ink);
+}
+
+.sidebar-logout-button:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 2px;
 }
 
 .terms-policies-button {

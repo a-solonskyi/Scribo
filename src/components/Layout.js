@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
+import { LogOut } from "lucide-react";
 
 import { signOutProfessor } from "../sites/auth";
 import { getAssignment, getClasses, getSubmission } from "../sites/database";
@@ -194,10 +195,18 @@ export default function Layout({ children, session }) {
             </button>
           </div>
           {session?.approved ? <TermsPoliciesButton /> : null}
-          <p className="sidebar-email">{session?.user?.email}</p>
-          <button className="sidebar-logout-button" type="button" onClick={handleLogout}>
-            Logout
-          </button>
+          <div className="sidebar-account">
+            <p className="sidebar-email">{session?.user?.email}</p>
+            <button
+              className="sidebar-logout-button"
+              type="button"
+              aria-label="Log out"
+              title="Log out"
+              onClick={handleLogout}
+            >
+              <LogOut size={16} strokeWidth={1.6} aria-hidden="true" />
+            </button>
+          </div>
         </div>
       </aside>
       <main className="platform-main">{children}</main>
