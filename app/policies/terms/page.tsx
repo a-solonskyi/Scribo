@@ -1,4 +1,4 @@
-import Link from 'next/link';
+/* oxlint-disable next/no-html-link-for-pages -- Use document navigation: vinext's production Link handler fails on these public routes. */
 import type { Metadata } from 'next';
 import PolicyPage from '../policy-page';
 
@@ -22,9 +22,9 @@ export default function TermsPage() {
           service.
         </p>
         <p>
-          The <Link href="/policies/privacy">Privacy policy</Link> explains how
+          The <a href="/policies/privacy">Privacy policy</a> explains how
           information is handled, and the{' '}
-          <Link href="/policies/cookies">Cookies policy</Link> explains browser
+          <a href="/policies/cookies">Cookies policy</a> explains browser
           storage.
         </p>
       </section>

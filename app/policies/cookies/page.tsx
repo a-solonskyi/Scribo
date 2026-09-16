@@ -1,4 +1,4 @@
-import Link from 'next/link';
+/* oxlint-disable next/no-html-link-for-pages -- Use document navigation: vinext's production Link handler fails on these public routes. */
 import type { Metadata } from 'next';
 import PolicyPage from '../policy-page';
 
@@ -144,7 +144,7 @@ export default function CookiesPage() {
           error-reporting SDKs, or general browsing-session replay. Its
           educational writing replay is generated from editor events and is part
           of the essay service, as explained in the{' '}
-          <Link href="/policies/privacy">Privacy policy</Link>.
+          <a href="/policies/privacy">Privacy policy</a>.
         </p>
         <p>
           The YouTube tutorial, donation website, and research reference are

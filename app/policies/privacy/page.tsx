@@ -1,4 +1,4 @@
-import Link from 'next/link';
+/* oxlint-disable next/no-html-link-for-pages -- Use document navigation: vinext's production Link handler fails on these public routes. */
 import type { Metadata } from 'next';
 import PolicyPage from '../policy-page';
 
@@ -153,7 +153,7 @@ export default function PrivacyPage() {
           submissions, and annotations are stored in a Cloudflare D1 database.
           No file-storage bucket or upload service is connected. Browser draft
           storage is described in the{' '}
-          <Link href="/policies/cookies">Cookies policy</Link>.
+          <a href="/policies/cookies">Cookies policy</a>.
         </p>
         <p>
           ChatGPT provides sign-in. OpenAI and Cloudflare control parts of

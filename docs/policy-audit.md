@@ -32,7 +32,7 @@ These notices are linked for provider practices, not treated as proof that every
 
 ## Implementation
 
-Three explicit public App Router routes render policy content without importing the authenticated application, querying its database, or loading its session. Shared page chrome identifies the operator, update date, current document, and website return link. Next links provide policy-to-policy navigation.
+Three explicit public App Router routes render policy content without importing the authenticated application, querying its database, or loading its session. Shared page chrome identifies the operator, update date, current document, and website return link. Native anchors provide policy-to-policy navigation and return links using full document loads.
 
 The professor-only sidebar button sits directly below Donate, has a transparent background, and reuses the existing Base UI popover wrapper. Public/sign-in links use the same link component. Popover and sign-in links open new tabs with `noopener noreferrer` and a screen-reader new-tab indication. In-document navigation stays in the current tab.
 
@@ -52,3 +52,9 @@ The professor-only sidebar button sits directly below Donate, has a transparent 
 2. Decide a server-record retention schedule and whether to add account/draft deletion controls. Currently requests are handled through the operator contact, and no timed cleanup exists.
 3. Consider explicitly informing students, before writing/submission, that detailed writing history and submission IP/country/OS are available to the professor. No new consent flow or banner was added in this task.
 4. Local account backups survive logout. A future shared-device cleanup feature would need a separate decision to avoid destroying unsaved work.
+
+## Navigation correction — 17 September 2026
+
+The published vinext `next/link` handler threw `TypeError: e is not a function` on Back to Scribo; client prefetch also failed. The development preview did not reproduce the production failure. Replaced Next links throughout the policy documents with native anchors, retaining same-tab navigation and standard browser history. Both return links and the wordmark now use full document navigation, including when returning to the React Router application. Policy content and its last-updated date are unchanged.
+
+Regression verification: the compiled production build successfully returned to sign-in from the header/footer links, all three documents, keyboard activation, and the wordmark. Policy-to-policy navigation and browser Back passed. The signed-in development session returned to the professor dashboard. TypeScript, policy-file lint, diff checks, and production build passed.
