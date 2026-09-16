@@ -1437,6 +1437,26 @@ button:disabled {
   max-width: 680px;
 }
 
+.student-writing-layout.has-deadline {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(0, 1180px) minmax(24px, 1fr);
+  align-items: start;
+}
+
+.student-writing-layout > .student-shell {
+  width: 100%;
+  min-width: 0;
+}
+
+.student-deadline-rail {
+  min-width: 0;
+  padding: 42px 24px 0 32px;
+}
+
+.student-deadline-rail .assignment-deadline {
+  max-width: 220px;
+}
+
 .student-header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) max-content;
@@ -1446,10 +1466,6 @@ button:disabled {
   margin-bottom: 32px;
   padding-bottom: 24px;
   border-bottom: 1px solid var(--ink);
-}
-
-.student-header.has-deadline {
-  grid-template-columns: minmax(150px, 190px) minmax(0, 1fr) max-content;
 }
 
 .student-header > h1 {
@@ -1553,6 +1569,14 @@ button:disabled {
   color: #666;
   font-style: italic;
   opacity: 1;
+}
+
+/* Chrome paints autofilled names blue even after blur. Preserve autofill while
+   matching the writing surface and the field's existing gray text. */
+.student-name-field input:is(:autofill, :-webkit-autofill) {
+  box-shadow: 0 0 0 1000px var(--canvas) inset;
+  -webkit-text-fill-color: #666;
+  caret-color: #666;
 }
 
 .student-name-field input:focus-visible {
@@ -1717,6 +1741,120 @@ button:disabled {
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+
+.deadline-field {
+  display: grid;
+  gap: 10px;
+}
+
+.deadline-picker-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 0 0 10px;
+  border: 0;
+  border-bottom: 1px solid var(--medium-gray);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+}
+
+/* The shared popover positioner uses this utility class. The existing site
+   uses plain CSS, so give this calendar portal its own stacking level. */
+.z-50:has(> .deadline-picker-dialog) {
+  z-index: 60;
+}
+
+.deadline-picker-dialog {
+  width: min(320px, calc(100vw - 32px));
+  max-height: var(--available-height, calc(100dvh - 32px));
+  overflow-y: auto;
+  padding: 16px;
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
+  outline: none;
+}
+
+.deadline-picker-title {
+  margin: 0 0 16px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.deadline-calendar {
+  --cell-size: 36px;
+  width: 100%;
+  padding: 0;
+  font-size: 0.875rem;
+}
+
+.deadline-calendar .rdp-months { position: relative; }
+.deadline-calendar .rdp-month_caption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  margin-bottom: 10px;
+}
+.deadline-calendar .rdp-caption_label { font-weight: 500; }
+.deadline-calendar .rdp-nav {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.deadline-calendar .rdp-nav button { pointer-events: auto; }
+.deadline-calendar .rdp-month_grid { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.deadline-calendar .rdp-weekday { height: 32px; color: #666; font-weight: 400; font-size: 0.75rem; }
+.deadline-calendar .rdp-day { height: 36px; padding: 1px; text-align: center; }
+.deadline-calendar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font: inherit;
+}
+.deadline-calendar button:hover { background: var(--selection); }
+.deadline-calendar button:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+.deadline-calendar .rdp-outside button { color: var(--medium-gray); }
+.deadline-calendar .rdp-today button { border-color: var(--medium-gray); }
+.deadline-calendar button[data-selected-single="true"] { background: var(--ink); color: var(--canvas); }
+.deadline-calendar svg { width: 18px; height: 18px; }
+
+.deadline-picker-time {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 16px 0;
+  font-size: 0.875rem;
+}
+.deadline-picker-time input {
+  min-height: 36px;
+  padding: 6px 8px;
+  border: 1px solid var(--medium-gray);
+  border-radius: 0;
+  background: var(--canvas);
+  color: var(--ink);
+}
+.deadline-picker-actions { display: flex; align-items: center; gap: 20px; }
+.deadline-picker-actions .filled-button { min-width: 64px; margin-left: auto; }
+.create-essay-button { min-height: 42px; }
 
 .instructions-editor {
   border: 1px solid var(--light-gray);
@@ -2903,6 +3041,16 @@ button:disabled {
   clip: rect(0, 0, 0, 0);
 }
 
+@media (max-width: 1100px) {
+  .student-writing-layout.has-deadline { display: block; }
+  .student-deadline-rail {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 48px 0;
+  }
+  .student-deadline-rail .assignment-deadline { max-width: none; }
+}
+
 @media (max-width: 900px) {
   .platform-shell {
     display: block;
@@ -2945,15 +3093,12 @@ button:disabled {
     display: block;
   }
 
-  .student-header,
-  .student-header.has-deadline {
+  .student-header {
     grid-template-columns: minmax(0, 1fr) max-content;
     gap: 20px 16px;
   }
 
-  .student-header > .assignment-deadline {
-    grid-column: 1 / -1;
-  }
+  .student-deadline-rail { padding-right: 20px; padding-left: 20px; }
 
   .auth-screen {
     display: block;

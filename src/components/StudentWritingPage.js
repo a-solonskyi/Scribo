@@ -367,9 +367,12 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
   }
 
   return (
+    <div className={`student-writing-layout${assignment?.deadline ? " has-deadline" : ""}`}>
+      {assignment?.deadline ? <aside className="student-deadline-rail" aria-label="Essay deadline">
+        <AssignmentDeadline deadline={assignment.deadline} />
+      </aside> : null}
     <form className="student-shell" onSubmit={handleSubmit}>
-      <div className={`student-header${assignment?.deadline ? " has-deadline" : ""}`}>
-        <AssignmentDeadline deadline={assignment?.deadline} />
+      <div className="student-header">
         <h1>{assignment?.topic}</h1>
         <button className="filled-button student-submit-button" type="submit" disabled={saving}>
           {saving ? "Submitting" : "Submit"}
@@ -438,5 +441,6 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
       </fieldset>
       <ErrorState message={error} />
     </form>
+    </div>
   );
 }

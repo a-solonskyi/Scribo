@@ -3,6 +3,7 @@ import { useState } from "react";
 import { createAssignment } from "../sites/database";
 import { ErrorState } from "./LoadingState";
 import InstructionsEditor from "./InstructionsEditor";
+import DeadlinePicker from "./DeadlinePicker";
 import { normalizeInstructions } from "../utils/assignmentInstructions";
 import { localDeadlineToIso } from "../utils/deadlines";
 
@@ -63,16 +64,9 @@ export default function AssignmentCreateModal({
             <span className="instructions-field-label">Instructions</span>
             <InstructionsEditor onChange={setInstructions} disabled={saving} />
           </div>
-          <label>
-            <span>Deadline</span>
-            <input
-              type="datetime-local"
-              value={deadline}
-              onChange={(event) => setDeadline(event.target.value)}
-            />
-          </label>
+          <DeadlinePicker value={deadline} onChange={setDeadline} disabled={saving} />
           <ErrorState message={error} />
-          <button className="primary-button" type="submit" disabled={saving}>
+          <button className="filled-button create-essay-button" type="submit" disabled={saving}>
             {saving ? "Creating" : "Create essay"}
           </button>
         </form>
