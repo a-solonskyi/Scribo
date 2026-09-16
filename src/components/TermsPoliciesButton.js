@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { FileText } from 'lucide-react';
 import {
   Popover,
   PopoverClose,
@@ -16,7 +17,8 @@ export default function TermsPoliciesButton() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger className="terms-policies-button" ref={triggerRef}>
-        Terms &amp; Policies
+        <FileText size={16} strokeWidth={1.75} aria-hidden="true" />
+        <span>Terms &amp; Policies</span>
       </PopoverTrigger>
       <PopoverContent
         className="policies-popover"

@@ -204,7 +204,7 @@ export default function Layout({ children, session }) {
               title="Log out"
               onClick={handleLogout}
             >
-              <LogOut size={16} strokeWidth={1.6} aria-hidden="true" />
+              <LogOut size={14} strokeWidth={1.6} aria-hidden="true" />
             </button>
           </div>
         </div>

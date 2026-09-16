@@ -726,10 +726,12 @@ button:disabled {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 32px;
-  width: 32px;
-  height: 32px;
-  padding: 6px;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  margin-left: auto;
+  margin-right: -12px;
+  padding: 7px;
   border: 0;
   background: transparent;
   color: var(--medium-gray);
@@ -749,21 +751,25 @@ button:disabled {
 }
 
 .terms-policies-button {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   width: fit-content;
   min-height: 36px;
   padding: 4px 0;
   border: 0;
   border-radius: 0;
   background: transparent;
-  color: var(--ink);
+  color: #666;
   font-size: 14px;
+  font-weight: 500;
   line-height: 1.4;
-  letter-spacing: 0.025em;
+  letter-spacing: 0;
   text-align: left;
 }
 
-.terms-policies-button:hover { text-decoration: underline; text-underline-offset: 4px; }
+.terms-policies-button svg { flex-shrink: 0; }
+.terms-policies-button:hover { color: var(--ink); }
 .policies-popover {
   width: min(290px, calc(100vw - 32px));
   max-height: var(--available-height);
