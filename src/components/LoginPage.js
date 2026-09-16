@@ -3,6 +3,7 @@ import { Link, Navigate } from "react-router-dom";
 
 import { activateProfessor, verifyTutorialInvitationCode } from "../sites/auth";
 import { ErrorState } from "./LoadingState";
+import PolicyLinks from "./PolicyLinks";
 
 const FEATURES = [
   ["Writing replay", "Review the essay as it developed, keystroke by keystroke."],
@@ -183,6 +184,9 @@ export default function LoginPage({ session }) {
             Professor access only. Student writing links remain open without a professor account.
           </p>
         )}
+        <nav className="public-policy-links policy-links" aria-label="Terms and policies">
+          <PolicyLinks />
+        </nav>
       </aside>
 
       {tutorialDialogOpen ? (

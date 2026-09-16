@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 
 import { signOutProfessor } from "../sites/auth";
 import { getAssignment, getClasses, getSubmission } from "../sites/database";
+import TermsPoliciesButton from "./TermsPoliciesButton";
 
 export default function Layout({ children, session }) {
   const location = useLocation();
@@ -192,6 +193,7 @@ export default function Layout({ children, session }) {
               Donate
             </button>
           </div>
+          {session?.approved ? <TermsPoliciesButton /> : null}
           <p className="sidebar-email">{session?.user?.email}</p>
           <button className="sidebar-logout-button" type="button" onClick={handleLogout}>
             Logout
