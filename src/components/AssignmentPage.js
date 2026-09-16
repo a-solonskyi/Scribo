@@ -9,6 +9,7 @@ import {
 import { formatDateTime } from "../utils/timeFormatting";
 import { ErrorState, LoadingState } from "./LoadingState";
 import SubmissionList from "./SubmissionList";
+import AssignmentInstructions from "./AssignmentInstructions";
 
 export default function AssignmentPage() {
   const { assignmentId } = useParams();
@@ -81,7 +82,7 @@ export default function AssignmentPage() {
       <div className="page-header">
         <div>
           <h1>{assignment?.topic}</h1>
-          <p>{assignment?.instructions}</p>
+          <AssignmentInstructions instructions={assignment?.instructions} />
           {assignment?.deadline ? (
             <p className="muted-line">Deadline: {formatDateTime(assignment.deadline)}</p>
           ) : null}

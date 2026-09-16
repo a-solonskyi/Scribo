@@ -59,6 +59,20 @@ export const submissions = sqliteTable(
   (table) => [index("idx_submissions_assignment_id").on(table.assignmentId)],
 );
 
+export const studentDrafts = sqliteTable(
+  "student_drafts",
+  {
+    id: text("id").primaryKey(),
+    assignmentId: text("assignment_id").notNull().references(() => assignments.id, { onDelete: "cascade" }),
+    userId: text("user_id").notNull(),
+    draftJson: text("draft_json").notNull(),
+    revision: text("revision").notNull(),
+    updatedAt: text("updated_at").notNull(),
+    submittedAt: text("submitted_at"),
+  },
+  (table) => [uniqueIndex("idx_student_drafts_assignment_user").on(table.assignmentId, table.userId)],
+);
+
 export const responseAnnotations = sqliteTable(
   "response_annotations",
   {

@@ -1,0 +1,219 @@
+.policy-shell {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 30px 40px 64px;
+}
+
+.policy-site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--ink);
+}
+
+.policy-shell a {
+  color: var(--ink);
+  text-underline-offset: 4px;
+}
+.policy-shell a:hover {
+  text-decoration-thickness: 2px;
+}
+.policy-back-link {
+  font-size: 14px;
+}
+
+.policy-grid {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 740px);
+  gap: 64px;
+  padding-top: 48px;
+}
+
+.policy-navigation {
+  align-self: start;
+  position: sticky;
+  top: 32px;
+}
+.policy-navigation > p {
+  margin: 0 0 20px;
+  font-size: 14px;
+}
+.policy-navigation nav {
+  display: grid;
+  gap: 6px;
+}
+.policy-navigation a {
+  padding: 10px 0;
+  color: #595959;
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.policy-navigation a[aria-current='page'] {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+.policy-document {
+  min-width: 0;
+  font-size: 16px;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+}
+.policy-document-header {
+  padding-bottom: 30px;
+  border-bottom: 1px solid var(--light-gray);
+}
+.policy-updated {
+  margin: 0 0 18px;
+  color: #595959;
+  font-size: 14px;
+}
+.policy-document h1 {
+  margin: 0 0 22px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(2.5rem, 5vw, 3.75rem);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+.policy-introduction {
+  margin: 0 0 24px;
+  font-size: 18px;
+  line-height: 1.55;
+}
+.policy-operator {
+  font-size: 14px;
+  font-style: normal;
+  line-height: 1.8;
+}
+.policy-document > section {
+  margin-top: 36px;
+}
+.policy-document h2 {
+  margin: 0 0 14px;
+  font-size: 21px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+.policy-document h3 {
+  margin: 0 0 10px;
+  font-size: 17px;
+  font-weight: 600;
+}
+.policy-document p {
+  overflow-wrap: anywhere;
+}
+.policy-document section p {
+  margin: 0 0 16px;
+}
+.policy-document ul {
+  padding-left: 24px;
+}
+.policy-document li {
+  margin-bottom: 14px;
+}
+.policy-document code {
+  font-size: 0.875em;
+  overflow-wrap: anywhere;
+}
+.policy-storage-list > section {
+  padding: 24px 0 12px;
+  border-top: 1px solid var(--light-gray);
+}
+.policy-storage-list dl {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 12px 20px;
+  margin: 0 0 16px;
+}
+.policy-storage-list dt {
+  font-weight: 600;
+}
+.policy-storage-list dd {
+  margin: 0;
+}
+.policy-document-footer {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--ink);
+  font-size: 14px;
+}
+.policy-document-footer p {
+  margin: 0 0 18px;
+}
+.policy-shell :focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 5px;
+}
+.policy-skip-link {
+  position: fixed;
+  top: 8px;
+  left: 16px;
+  z-index: 100;
+  padding: 12px;
+  background: var(--canvas);
+  transform: translateY(-160%);
+}
+.policy-skip-link:focus {
+  transform: translateY(0);
+}
+
+@media (max-width: 820px) {
+  .policy-shell {
+    padding: 24px 20px 48px;
+  }
+  .policy-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+    padding-top: 26px;
+  }
+  .policy-navigation {
+    position: static;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--light-gray);
+  }
+  .policy-navigation > p {
+    margin-bottom: 8px;
+  }
+  .policy-navigation nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .policy-storage-list dl {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+  .policy-storage-list dd {
+    margin-bottom: 12px;
+  }
+}
+
+@media print {
+  .policy-shell {
+    padding: 0;
+  }
+  .policy-grid {
+    display: block;
+    padding-top: 24px;
+  }
+  .policy-navigation,
+  .policy-skip-link,
+  .policy-back-link {
+    display: none;
+  }
+  .policy-document {
+    font-size: 11pt;
+  }
+  .policy-document h2,
+  .policy-document h3 {
+    break-after: avoid;
+  }
+}

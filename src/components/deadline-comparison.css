@@ -1,0 +1,41 @@
+.deadline-comparison { max-width: 1280px; margin: 0 auto; padding: 0 40px 24px; color: #000; background: #fff; }
+.comparison-header { height: 76px; display: flex; align-items: center; gap: 34px; border-bottom: 1px solid #ddd; }
+.comparison-header > span { font-size: 13px; color: #777; }
+.comparison-header > a:last-child { margin-left: auto; color: #555; font-size: 13px; text-underline-offset: 4px; }
+.comparison-heading { display: flex; justify-content: space-between; align-items: center; padding: 28px 0; gap: 24px; }
+.comparison-heading h1 { margin: 0; font: 400 34px/1.2 Georgia, serif; letter-spacing: -.025em; }
+.comparison-heading p { color: #777; font-size: 13px; margin: 9px 0 0; }
+.comparison-replay { color: #fff; background: #000; border: 1px solid #000; padding: 12px 20px; font-size: 14px; white-space: nowrap; }
+.comparison-panes { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid #000; border-bottom: 1px solid #ddd; }
+.comparison-pane + .comparison-pane { border-left: 1px solid #ddd; }
+.comparison-pane-heading { display: flex; align-items: baseline; gap: 18px; padding: 18px 30px 0; }
+.comparison-pane-heading h2 { font-size: 14px; font-weight: 500; margin: 0; }
+.comparison-pane-heading span { font-size: 12px; color: #777; }
+.deadline-comparison-stage { position: relative; height: max(390px, calc(100vh - 358px)); }
+.deadline-comparison-stage > .assignment-deadline { position: absolute; left: calc(50% - 94px); top: 25px; width: 194px; font-size: 13px; }
+.comparison-controls { padding-top: 20px; }
+.comparison-progress { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 16px; }
+.comparison-progress output { font-variant-numeric: tabular-nums; }
+.comparison-progress output span { color: #777; }
+.comparison-controls input { display: block; appearance: none; height: 2px; width: 100%; padding: 0; margin: 0; accent-color: #000; background: linear-gradient(to right, #000 var(--progress), #ddd var(--progress)); }
+.comparison-controls input::-webkit-slider-thumb { appearance: none; width: 10px; height: 10px; border-radius: 50%; background: #000; }
+.comparison-controls input::-moz-range-thumb { width: 10px; height: 10px; border: 0; border-radius: 50%; background: #000; }
+.comparison-control-buttons, .comparison-control-buttons > div { display: flex; align-items: center; gap: 26px; }
+.comparison-control-buttons { justify-content: space-between; margin-top: 16px; }
+.comparison-control-buttons button { border: 0; background: transparent; padding: 4px 0; color: #555; font-size: 12px; }
+.comparison-control-buttons button:hover { color: #000; text-decoration: underline; text-underline-offset: 4px; }
+.comparison-control-buttons > button { color: #000; }
+@media (max-width: 700px) {
+  .deadline-comparison { padding: 0 18px 22px; }
+  .comparison-header { gap: 15px; }
+  .comparison-header > span { display: none; }
+  .comparison-heading { padding: 24px 0; gap: 15px; }
+  .comparison-heading h1 { font-size: 26px; }
+  .comparison-replay { font-size: 12px; padding: 10px 13px; }
+  .comparison-heading p { font-size: 12px; }
+  .comparison-pane-heading { padding: 16px 12px 0; min-height: 70px; flex-direction: column; gap: 6px; }
+  .deadline-comparison-stage { height: 410px; overflow: hidden; }
+  .deadline-comparison-stage > .assignment-deadline { left: calc(50% - 78px); width: 160px; font-size: 12px; }
+  .comparison-control-buttons, .comparison-control-buttons > div { gap: 14px; flex-wrap: wrap; }
+  .deadline-comparison-stage .deadline-wine { transform: scale(.76); transform-origin: 0 0; }
+}

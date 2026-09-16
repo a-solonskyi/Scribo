@@ -1,5 +1,7 @@
 import { eq } from "drizzle-orm";
-import { getDb } from "@/db";
+import { getDb, getRawDb } from "@/db";
+import { getChatGPTUser } from "@/app/chatgpt-auth";
+import { findStudentDraft } from "@/lib/server/student-drafts";
 import { assignments, submissions } from "@/db/schema";
 import { errorResponse, readJsonObject, stringValue } from "@/lib/server/data";
 
@@ -78,6 +80,41 @@ export async function POST(request: Request) {
   const [assignment] = await getDb().select({ id: assignments.id })
     .from(assignments).where(eq(assignments.id, assignmentId)).limit(1);
   if (!assignment) return errorResponse("Essay link is no longer available.", 404);
+
+  if (Object.hasOwn(body, "student_draft_revision")) {
+    const user = await getChatGPTUser();
+    if (!user) return errorResponse("Sign in with ChatGPT again before submitting.", 401);
+    if (body.expected_user_id !== user.userId) return errorResponse("Your signed-in account changed. Sign in with the original account before submitting.", 401);
+    const origin = request.headers.get("origin");
+    if (origin && origin !== new URL(request.url).origin) return errorResponse("Invalid request origin.", 403);
+    const revision = stringValue(body.student_draft_revision);
+    const draft = await findStudentDraft(assignmentId, user.userId);
+    // A retry after a lost submission response must not submit the essay twice.
+    if (draft?.submitted_at) return Response.json({ ok: true });
+    if (!draft || draft.revision !== revision) return errorResponse("Your account draft changed. Download your edits and reload before submitting.", 409);
+    const submittedAt = new Date().toISOString();
+    const db = getRawDb();
+    const result = await db.batch([
+      db.prepare(`
+        INSERT INTO submissions (id, assignment_id, student_name, final_text, title, stats_json, event_log_json, paste_events_json, pause_events_json, submitted_at)
+        SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ? FROM student_drafts
+        WHERE assignment_id = ? AND user_id = ? AND revision = ? AND submitted_at IS NULL
+      `).bind(crypto.randomUUID(), assignmentId, studentName, finalText,
+        stringValue(body.title).slice(0, 240) || null,
+        jsonText({ ...stats, deviceInfo: getDeviceInfo(request) }, {}),
+        jsonText(body.event_log_json, []), jsonText(body.paste_events_json, []), jsonText(body.pause_events_json, []),
+        submittedAt, assignmentId, user.userId, revision),
+      db.prepare(`
+        UPDATE student_drafts SET submitted_at = ?, updated_at = ?
+        WHERE assignment_id = ? AND user_id = ? AND revision = ? AND submitted_at IS NULL
+      `).bind(submittedAt, submittedAt, assignmentId, user.userId, revision),
+    ]);
+    if (!result[0].meta.changes) {
+      const latest = await findStudentDraft(assignmentId, user.userId);
+      if (!latest?.submitted_at) return errorResponse("Your draft changed in another tab. Download your edits and reload before submitting.", 409);
+    }
+    return Response.json({ ok: true }, { status: 201 });
+  }
 
   await getDb().insert(submissions).values({
     id: crypto.randomUUID(),

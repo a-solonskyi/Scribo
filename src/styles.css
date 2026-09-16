@@ -730,6 +730,45 @@ button:disabled {
   color: var(--ink);
 }
 
+.terms-policies-button {
+  display: block;
+  width: fit-content;
+  min-height: 36px;
+  padding: 4px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.4;
+  letter-spacing: 0.025em;
+  text-align: left;
+}
+
+.terms-policies-button:hover { text-decoration: underline; text-underline-offset: 4px; }
+.policies-popover {
+  width: min(290px, calc(100vw - 32px));
+  max-height: var(--available-height);
+  overflow-y: auto;
+  padding: 16px;
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
+  font-size: 14px;
+}
+.policies-popover-heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--light-gray); }
+.policies-popover-heading [data-slot="popover-title"] { margin: 0; font-size: 14px; font-weight: 500; }
+.policies-close { min-height: 32px; padding: 4px 0; border: 0; background: transparent; color: var(--ink); font-size: 14px; text-decoration: underline; text-underline-offset: 4px; }
+.policy-links { display: grid; gap: 4px; }
+.policy-links a { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 40px; padding: 8px 0; color: var(--ink); font-size: 14px; line-height: 1.4; text-decoration: none; }
+.policy-links a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.policy-links svg { flex-shrink: 0; }
+.public-policy-links { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--light-gray); }
+.terms-policies-button:focus-visible, .policies-popover :focus-visible, .public-policy-links :focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+.policy-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
 .sidebar-donation {
   position: relative;
 }
@@ -1437,32 +1476,151 @@ button:disabled {
   max-width: 680px;
 }
 
+.student-writing-layout.has-deadline {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(0, 1180px) minmax(24px, 1fr);
+  align-items: start;
+}
+
+.student-writing-layout > .student-shell {
+  width: 100%;
+  min-width: 0;
+}
+
+.student-deadline-rail {
+  min-width: 0;
+  padding: 42px 24px 0 32px;
+}
+
+.student-deadline-rail .assignment-deadline {
+  max-width: 220px;
+}
+
 .student-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 32px;
+  gap: 24px 28px;
   margin-bottom: 32px;
   padding-bottom: 24px;
   border-bottom: 1px solid var(--ink);
 }
 
-.student-submit-button {
-  align-self: flex-start;
+.student-header > h1 {
   min-width: 0;
-  min-height: 0;
-  padding: 8px 12px;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.student-header > .assignment-instructions {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.assignment-deadline {
+  min-width: 0;
+  padding-top: 4px;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.deadline-label {
+  display: block;
+  margin-bottom: 6px;
+  color: #666;
+}
+
+.assignment-instructions {
+  min-width: 0;
+  margin-top: 20px;
+  font-size: 1rem;
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: #666;
+  overflow-wrap: anywhere;
+}
+
+.instructions-preview.is-collapsed {
+  max-height: 7.5em;
+  overflow: hidden;
+}
+
+.instructions-content {
+  display: flow-root;
+  line-height: 1.5;
+}
+
+.instructions-content p,
+.student-entry .instructions-content p {
+  margin: 0 0 0.75em;
+  color: inherit;
+  font: inherit;
+}
+
+.instructions-content > :last-child {
+  margin-bottom: 0;
+}
+
+.instructions-plain-text {
+  white-space: pre-wrap;
+}
+
+.instructions-content h2,
+.instructions-content h3,
+.instructions-content h4 {
+  margin: 0.75em 0 0.4em;
+  color: var(--ink);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.instructions-content h2 { font-size: 1.5em; }
+.instructions-content h3 { font-size: 1.25em; }
+.instructions-content h4 { font-size: 1.1em; }
+.instructions-content > :first-child { margin-top: 0; }
+.instructions-toggle { margin-top: 12px; }
+
+.student-submit-button {
+  flex-shrink: 0;
+  align-self: flex-start;
+  min-width: 88px;
+  min-height: 40px;
+  padding: 10px 14px;
   line-height: 1.19;
   white-space: nowrap;
 }
 
 .student-name-field {
-  max-width: 420px;
+  max-width: 480px;
   margin-bottom: 32px;
 }
 
 .student-name-field input {
   border-bottom: 0;
+  color: #666;
+  font-style: italic;
+  font-size: 0.875rem;
+}
+
+.student-name-field input::placeholder {
+  color: #666;
+  font-style: italic;
+  opacity: 1;
+}
+
+/* Chrome paints autofilled names blue even after blur. Preserve autofill while
+   matching the writing surface and the field's existing gray text. */
+.student-name-field input:is(:autofill, :-webkit-autofill) {
+  box-shadow: 0 0 0 1000px var(--canvas) inset;
+  -webkit-text-fill-color: #666;
+  caret-color: #666;
+}
+
+.student-name-field input:focus-visible {
+  outline: 1px solid var(--medium-gray);
+  outline-offset: 4px;
 }
 
 .student-shell .essay-main {
@@ -1472,6 +1630,107 @@ button:disabled {
 
 .submitted-download-button {
   margin-top: 12px;
+}
+
+.student-entry h2 {
+  margin: 36px 0 20px;
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.student-entry p {
+  font-size: 1rem;
+  line-height: 1.6;
+  letter-spacing: 0;
+}
+
+.student-entry-options {
+  display: grid;
+  gap: 20px;
+}
+
+.student-entry-option {
+  padding: 24px;
+  border: 1px solid var(--light-gray);
+}
+
+.student-entry-option h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.student-entry-option p {
+  margin: 12px 0 20px;
+  color: #505050;
+}
+
+.student-signin {
+  display: inline-flex;
+  text-decoration: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.student-entry-option button,
+.student-entry-option a {
+  font-size: 0.875rem;
+  min-height: 44px;
+}
+
+.student-save-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px 24px;
+  margin: -8px 0 24px;
+}
+
+.student-save-status {
+  display: block;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.student-save-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+}
+
+.draft-text-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.student-storage-note,
+.student-entry .student-storage-note {
+  margin: 8px 0 0;
+  color: #595959;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.student-entry .student-storage-note { margin-top: 24px; }
+.student-storage-details { margin: -8px 0 28px; font-size: 0.875rem; line-height: 1.6; }
+.student-storage-details summary { cursor: pointer; }
+.student-storage-details p { max-width: 760px; color: #595959; }
+.student-writing-fields { min-width: 0; margin: 0; padding: 0; border: 0; }
+.draft-preview { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+@media (max-width: 600px) {
+  .student-entry-option { padding: 20px 16px; }
+  .student-entry-option button, .student-entry-option a { width: 100%; }
 }
 
 .process-note {
@@ -1502,9 +1761,200 @@ button:disabled {
 
 .modal-panel {
   width: min(680px, 100%);
+  max-height: calc(100dvh - 56px);
+  overflow-y: auto;
   padding: 28px;
   border: 1px solid var(--ink);
   background: var(--canvas);
+}
+
+.instructions-field {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.instructions-field-label {
+  color: var(--medium-gray);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.deadline-field {
+  display: grid;
+  gap: 10px;
+}
+
+.deadline-picker-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 0 0 10px;
+  border: 0;
+  border-bottom: 1px solid var(--medium-gray);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+}
+
+/* The shared popover positioner uses this utility class. The existing site
+   uses plain CSS, so give this calendar portal its own stacking level. */
+.z-50:has(> .deadline-picker-dialog) {
+  z-index: 60;
+}
+
+.deadline-picker-dialog {
+  width: min(320px, calc(100vw - 32px));
+  max-height: var(--available-height, calc(100dvh - 32px));
+  overflow-y: auto;
+  padding: 16px;
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
+  outline: none;
+}
+
+.deadline-picker-title {
+  margin: 0 0 16px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.deadline-calendar {
+  --cell-size: 36px;
+  width: 100%;
+  padding: 0;
+  font-size: 0.875rem;
+}
+
+.deadline-calendar .rdp-months { position: relative; }
+.deadline-calendar .rdp-month_caption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  margin-bottom: 10px;
+}
+.deadline-calendar .rdp-caption_label { font-weight: 500; }
+.deadline-calendar .rdp-nav {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.deadline-calendar .rdp-nav button { pointer-events: auto; }
+.deadline-calendar .rdp-month_grid { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.deadline-calendar .rdp-weekday { height: 32px; color: #666; font-weight: 400; font-size: 0.75rem; }
+.deadline-calendar .rdp-day { height: 36px; padding: 1px; text-align: center; }
+.deadline-calendar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font: inherit;
+}
+.deadline-calendar button:hover { background: var(--selection); }
+.deadline-calendar button:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+.deadline-calendar .rdp-outside button { color: var(--medium-gray); }
+.deadline-calendar .rdp-today button { border-color: var(--medium-gray); }
+.deadline-calendar button[data-selected-single="true"] { background: var(--ink); color: var(--canvas); }
+.deadline-calendar svg { width: 18px; height: 18px; }
+
+.deadline-picker-time {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 16px 0;
+  font-size: 0.875rem;
+}
+.deadline-picker-time input {
+  min-height: 36px;
+  padding: 6px 8px;
+  border: 1px solid var(--medium-gray);
+  border-radius: 0;
+  background: var(--canvas);
+  color: var(--ink);
+}
+.deadline-picker-actions { display: flex; align-items: center; gap: 20px; }
+.deadline-picker-actions .filled-button { min-width: 64px; margin-left: auto; }
+.create-essay-button { min-height: 42px; }
+
+.instructions-editor {
+  border: 1px solid var(--light-gray);
+}
+
+.instructions-editor:focus-within {
+  border-color: var(--medium-gray);
+}
+
+.instructions-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  border-bottom: 1px solid var(--light-gray);
+}
+
+.instructions-toolbar select,
+.instructions-toolbar button {
+  min-height: 36px;
+  min-width: 36px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font: inherit;
+}
+
+.instructions-toolbar button[aria-pressed="true"] {
+  background: var(--selection);
+  border-color: var(--medium-gray);
+}
+
+.instructions-editor-content {
+  min-height: 150px;
+  max-height: 280px;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  padding: 12px;
+  outline: none;
+  font-size: 1rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.instructions-editor-content p { margin: 0 0 0.75em; }
+.instructions-editor-content > :last-child { margin-bottom: 0; }
+.instructions-editor-content h1 { font-size: 1.5em; }
+.instructions-editor-content h2 { font-size: 1.25em; }
+.instructions-editor-content h3 { font-size: 1.1em; }
+.instructions-editor-content h1,
+.instructions-editor-content h2,
+.instructions-editor-content h3 { margin: 0 0 0.5em; line-height: 1.3; }
+.instructions-editor-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--medium-gray);
+  pointer-events: none;
 }
 
 .stats-grid {
@@ -2630,6 +3080,16 @@ button:disabled {
   clip: rect(0, 0, 0, 0);
 }
 
+@media (max-width: 1100px) {
+  .student-writing-layout.has-deadline { display: block; }
+  .student-deadline-rail {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 48px 0;
+  }
+  .student-deadline-rail .assignment-deadline { max-width: none; }
+}
+
 @media (max-width: 900px) {
   .platform-shell {
     display: block;
@@ -2668,10 +3128,16 @@ button:disabled {
   }
 
   .page-header,
-  .student-header,
   .share-box {
     display: block;
   }
+
+  .student-header {
+    grid-template-columns: minmax(0, 1fr) max-content;
+    gap: 20px 16px;
+  }
+
+  .student-deadline-rail { padding-right: 20px; padding-left: 20px; }
 
   .auth-screen {
     display: block;

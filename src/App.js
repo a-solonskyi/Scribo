@@ -13,6 +13,8 @@ import Layout from "./components/Layout";
 import LoginPage from "./components/LoginPage";
 import ProfessorDashboard from "./components/ProfessorDashboard";
 import StudentWritingPage from "./components/StudentWritingPage";
+import DeadlinePrototypePage from "./components/DeadlinePrototypePage";
+import DeadlineComparisonPage from "./components/DeadlineComparisonPage";
 import SubmissionAnalyticsPage from "./components/SubmissionAnalyticsPage";
 import { ErrorState, LoadingState } from "./components/LoadingState";
 import { getCurrentSession, onAuthChange } from "./sites/auth";
@@ -60,6 +62,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/prototypes/deadline" element={<DeadlinePrototypePage />} />
+        <Route path="/prototypes/deadline/compare" element={<DeadlineComparisonPage />} />
         <Route path="/login" element={<LoginPage session={session} />} />
         <Route path="/write/:publicToken" element={<StudentWritingPage />} />
         <Route

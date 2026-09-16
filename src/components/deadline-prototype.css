@@ -1,0 +1,110 @@
+.deadline-prototype { min-height: 100vh; background: #fff; color: #000; }
+.prototype-header { min-height: 88px; margin: 0 36px; display: flex; align-items: center; gap: 42px; border-bottom: 1px solid #dedede; }
+.prototype-wordmark { font-family: Georgia, "Times New Roman", serif; font-size: 27px; color: #000; text-decoration: none; letter-spacing: -.04em; }
+.prototype-header-label { color: #737373; font-size: 11px; letter-spacing: .02em; }
+.prototype-header-label > span { padding: 0 12px; color: #aaa; }
+.prototype-options { display: flex; align-items: center; gap: 5px; margin-left: auto; }
+.prototype-options button { display: flex; gap: 12px; align-items: center; background: #fff; color: #555; padding: 10px 16px; font-size: 12px; border: 1px solid transparent; }
+.prototype-options button > span { font-size: 10px; color: #888; font-variant-numeric: tabular-nums; }
+.prototype-options button[aria-pressed="true"] { border-color: #000; color: #000; }
+.prototype-options button:hover { background: #f5f5f5; }
+.prototype-writing-layout.student-writing-layout { grid-template-columns: 250px minmax(0, 1060px) minmax(30px, 1fr); }
+.prototype-writing-layout .student-deadline-rail { padding: 49px 20px 0 36px; }
+.prototype-writing-layout .assignment-deadline { font-size: 12px; max-width: 192px; }
+.prototype-essay.student-shell { padding: 47px 34px 24px 44px; }
+.prototype-essay .student-header { gap: 22px 24px; margin-bottom: 28px; }
+.prototype-essay .student-header h1 { font-size: clamp(32px, 3.45vw, 52px); max-width: 650px; }
+.prototype-essay .student-header .prototype-assignment-copy { grid-column: 1 / -1; max-width: 720px; margin: 0; color: #777; font-size: 13px; line-height: 1.65; }
+.prototype-essay .student-submit-button { font-size: 12px; min-width: 78px; min-height: 36px; }
+.prototype-essay .student-submit-button:disabled { color: #fff; border-color: #000; background: #000; opacity: 1; }
+.prototype-essay .student-save-bar { margin-bottom: 28px; }
+.prototype-essay .student-save-status, .prototype-sample-note { font-size: 11px; color: #858585; }
+.prototype-essay .student-name-field { margin-bottom: 22px; }
+.prototype-essay .student-name-field input { font-size: 12px; }
+.prototype-essay .essay-editor-content { min-height: 138px; font-size: 16px; line-height: 1.9; letter-spacing: .005em; }
+.prototype-essay .essay-editor-shell { min-height: 0; }
+.prototype-essay .essay-editor-content { padding-bottom: 0; }
+.prototype-essay .essay-editor-content p { margin: 0 0 18px; }
+.prototype-essay .format-toolbar { gap: 16px; margin-bottom: 20px; }
+.prototype-essay .toolbar-button, .prototype-essay .heading-control { font-size: 12px; }
+.prototype-end-mark { color: #999; margin-top: 10px; font: italic 23px Georgia, serif; }
+.prototype-rail-caption { position: fixed; bottom: 25px; left: 36px; display: flex; flex-direction: column; gap: 6px; font-size: 10px; color: #777; }
+.prototype-rail-caption > :first-child { color: #333; }
+.prototype-review { margin-top: 46px; border-top: 1px solid #000; padding-top: 24px; }
+.prototype-direction-description { display: flex; justify-content: space-between; gap: 36px; margin-bottom: 28px; }
+.prototype-eyebrow { margin: 0 0 12px; text-transform: uppercase; font-size: 9px; letter-spacing: .13em; color: #777; }
+.prototype-eyebrow span { padding: 0 8px; }
+.prototype-direction-description h2 { font-family: Georgia, "Times New Roman", serif; font-size: 29px; font-weight: 400; letter-spacing: -.02em; margin: 0 0 10px; }
+.prototype-direction-description h2 + p { font-size: 11px; color: #777; margin: 0; line-height: 1.7; }
+.prototype-direction-number { font-family: Georgia, "Times New Roman", serif; font-size: 70px; line-height: 1; color: #dedede; }
+.prototype-timeline-header { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 13px; }
+.prototype-timeline-header output { font-variant-numeric: tabular-nums; }
+.prototype-timeline-header output span { color: #777; margin-left: 6px; }
+.prototype-scrubber { display: block; appearance: none; width: 100%; height: 2px; margin: 9px 0 14px; padding: 0; background: linear-gradient(to right, #000 var(--progress), #dedede var(--progress)); cursor: pointer; border-radius: 0; accent-color: #000; }
+.prototype-scrubber::-webkit-slider-thumb { appearance: none; width: 9px; height: 9px; border-radius: 50%; background: #000; }
+.prototype-scrubber::-moz-range-thumb { width: 9px; height: 9px; border: none; border-radius: 50%; background: #000; }
+.prototype-timeline-labels { position: relative; display: flex; justify-content: space-between; margin-top: 4px; }
+.prototype-timeline-labels button { background: none; border: none; padding: 4px 0; color: #777; font-size: 9px; }
+.prototype-timeline-labels button:nth-child(2) { position: absolute; left: 80%; transform: translateX(-50%); }
+.prototype-timeline-labels button:hover { color: #000; }
+.prototype-review-footer { display: flex; gap: 24px; align-items: center; justify-content: space-between; margin-top: 23px; }
+.prototype-review-footer > span { font-size: 9px; color: #888; }
+.prototype-review-footer > div { display: flex; align-items: center; gap: 22px; }
+.prototype-review-footer button { padding: 6px 0; background: none; border: 0; color: #666; font-size: 10px; }
+.prototype-review-footer .prototype-play { padding: 9px 13px; border: 1px solid #000; color: #000; min-width: 112px; }
+.prototype-page-footer { display: flex; justify-content: space-between; gap: 12px; margin-top: 34px; padding-top: 16px; border-top: 1px solid #e7e7e7; color: #888; font-size: 9px; }
+@media (min-width: 1101px) and (min-height: 920px) { .prototype-review { margin-top: 72px; } }
+@media (min-width: 701px) and (max-height: 820px) {
+  .prototype-header { min-height: 70px; }
+  .prototype-writing-layout .student-deadline-rail { padding-top: 33px; }
+  .prototype-essay.student-shell { padding-top: 31px; padding-bottom: 14px; }
+  .prototype-essay .student-header { gap: 15px 24px; padding-bottom: 18px; margin-bottom: 20px; }
+  .prototype-essay .student-header h1 { font-size: 40px; }
+  .prototype-essay .student-save-bar { margin-bottom: 18px; }
+  .prototype-essay .student-name-field { margin-bottom: 14px; }
+  .prototype-essay .format-toolbar { margin-bottom: 15px; }
+  .prototype-essay .essay-editor-content { font-size: 15px; line-height: 1.65; min-height: 112px; }
+  .prototype-essay .essay-editor-content p { margin-bottom: 12px; }
+  .prototype-end-mark { display: none; }
+  .prototype-review { margin-top: 20px; padding-top: 18px; }
+  .prototype-direction-description { margin-bottom: 16px; }
+  .prototype-direction-description h2 { font-size: 26px; }
+  .prototype-direction-number { font-size: 58px; }
+  .prototype-review-footer { margin-top: 16px; }
+  .prototype-page-footer { display: none; }
+}
+@media (max-width: 1100px) {
+  .prototype-header { margin: 0 24px; gap: 25px; }
+  .prototype-header-label { display: none; }
+  .prototype-writing-layout.student-writing-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr) 20px; }
+  .prototype-writing-layout .student-deadline-rail { margin: 0; padding-left: 26px; }
+  .prototype-essay.student-shell { padding-right: 10px; padding-left: 20px; }
+  .prototype-direction-description { gap: 12px; }
+  .prototype-direction-number { font-size: 50px; }
+}
+@media (max-width: 700px) {
+  .prototype-header { flex-wrap: wrap; margin: 0 20px; padding: 18px 0 14px; gap: 18px; }
+  .prototype-wordmark { font-size: 24px; }
+  .prototype-options { width: 100%; margin: 0; justify-content: space-between; }
+  .prototype-options button { gap: 7px; padding: 8px 10px; font-size: 11px; }
+  .prototype-writing-layout.student-writing-layout { display: block; }
+  .prototype-writing-layout .student-deadline-rail { padding: 26px 20px 0; }
+  .prototype-writing-layout .assignment-deadline { width: 142px; font-size: 11px; }
+  .prototype-essay.student-shell { margin-left: 157px; width: calc(100% - 157px); padding: 30px 20px 24px 10px; }
+  .prototype-essay .student-header { display: block; }
+  .prototype-essay .student-header h1 { font-size: 31px; }
+  .prototype-essay .student-submit-button { margin-top: 18px; }
+  .prototype-essay .student-header .prototype-assignment-copy { margin-top: 20px; font-size: 12px; }
+  .prototype-sample-note { display: none; }
+  .prototype-essay .essay-editor-content { font-size: 14px; }
+  .prototype-review { margin-top: 30px; }
+  .prototype-direction-number { display: none; }
+  .prototype-direction-description h2 { font-size: 26px; }
+  .prototype-timeline-header, .prototype-review-footer, .prototype-page-footer { flex-wrap: wrap; gap: 10px; }
+  .prototype-timeline-header output span { display: none; }
+  .prototype-timeline-labels { gap: 10px; }
+  .prototype-timeline-labels button { font-size: 8px; }
+  .prototype-timeline-labels button:nth-child(2) { position: static; transform: none; }
+  .prototype-review-footer > div { flex-wrap: wrap; gap: 12px; }
+  .prototype-rail-caption { left: 20px; font-size: 8px; max-width: 120px; }
+}

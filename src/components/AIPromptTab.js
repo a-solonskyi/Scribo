@@ -1,3 +1,5 @@
+import { instructionsText } from "../utils/assignmentInstructions";
+
 const PROMPT_BODY =
   "Act as a senior scientific investigator of the academic integrity office. I am attaching the essay writing details with the essay text to it. Please, review it on a matter of cheating, think more. Output as a detailed report with the one-line decision at the start, use text formatting for better reading of the findings.";
 
@@ -27,7 +29,7 @@ function buildPromptFile({ submission, stats, eventLog, pasteEvents, pauseEvents
     studentName: submission.student_name,
     essayTitle: submission.title || null,
     assignmentTopic: submission.assignments?.topic || null,
-    assignmentInstructions: submission.assignments?.instructions || null,
+    assignmentInstructions: instructionsText(submission.assignments?.instructions) || null,
     assignmentDeadline: submission.assignments?.deadline || null,
     submittedAt: submission.submitted_at,
   };

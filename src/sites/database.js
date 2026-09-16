@@ -4,7 +4,11 @@ async function request(path, options = {}) {
     headers: { "content-type": "application/json", ...options.headers },
   });
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || "The request could not be completed.");
+  if (!response.ok) {
+    const error = new Error(data.error || "The request could not be completed.");
+    error.status = response.status;
+    throw error;
+  }
   return data;
 }
 
@@ -50,6 +54,18 @@ export async function getAssignment(assignmentId) {
 
 export async function getAssignmentByPublicToken(publicToken) {
   return request(`/api/write/${publicToken}`, { cache: "no-store" });
+}
+
+export function getStudentDraft(publicToken) {
+  return request(`/api/write/${encodeURIComponent(publicToken)}/draft`, { cache: "no-store" });
+}
+
+export function saveStudentDraft(publicToken, payload) {
+  return request(`/api/write/${encodeURIComponent(publicToken)}/draft`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(15000),
+  });
 }
 
 export async function getSubmissionsForAssignment(assignmentId) {
