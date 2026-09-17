@@ -184,7 +184,7 @@ export default function Layout({ children, session }) {
               </section>
             ) : null}
             <button
-              className="filled-button sidebar-donate-button"
+              className="filled-button sidebar-action-button sidebar-donate-button"
               type="button"
               aria-expanded={Boolean(donationView)}
               onClick={() =>
@@ -194,7 +194,18 @@ export default function Layout({ children, session }) {
               Donate
             </button>
           </div>
-          {session?.approved ? <TermsPoliciesButton /> : null}
+          {session?.approved ? <>
+            <TermsPoliciesButton />
+            <a
+              className="sidebar-action-button sidebar-action-button-inverse"
+              href="/instructions"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Instructions
+              <span className="policy-sr-only"> (opens in a new tab)</span>
+            </a>
+          </> : null}
           <div className="sidebar-account">
             <p className="sidebar-email">{session?.user?.email}</p>
             <button
