@@ -5,6 +5,7 @@ import { LogOut } from "lucide-react";
 import { signOutProfessor } from "../sites/auth";
 import { getAssignment, getClasses, getSubmission } from "../sites/database";
 import TermsPoliciesButton from "./TermsPoliciesButton";
+import InstructionsButton from "./InstructionsButton";
 
 export default function Layout({ children, session }) {
   const location = useLocation();
@@ -196,15 +197,7 @@ export default function Layout({ children, session }) {
           </div>
           {session?.approved ? <>
             <TermsPoliciesButton />
-            <a
-              className="sidebar-action-button sidebar-action-button-inverse"
-              href="/instructions"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Instructions
-              <span className="policy-sr-only"> (opens in a new tab)</span>
-            </a>
+            <InstructionsButton />
           </> : null}
           <div className="sidebar-account">
             <p className="sidebar-email">{session?.user?.email}</p>
