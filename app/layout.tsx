@@ -1,22 +1,39 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+const description = "Writing replay, process insights, and thoughtful feedback.";
+const previewTitle = "Scribo — The story behind every essay.";
+const previewImage = {
+  url: "/og.png",
+  width: 1200,
+  height: 630,
+  alt: "Scribo: The story behind every essay. Writing replay. Process insights. Thoughtful feedback.",
+};
+
 export const metadata: Metadata = {
-  title: "Skribo Essay",
-  description: "Essay writing, process analytics, and professor response.",
+  metadataBase: new URL("https://skribo-essay.andriisolonskyi.chatgpt.site"),
+  title: "Scribo",
+  description,
   icons: {
-    icon: "/icon.svg",
+    icon: [
+      { url: "/favicon-16.png", type: "image/png", sizes: "16x16" },
+      { url: "/favicon-32.png", type: "image/png", sizes: "32x32" },
+      { url: "/icon.svg?v=draft-lines", type: "image/svg+xml", sizes: "any" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", type: "image/png", sizes: "180x180" }],
   },
   openGraph: {
-    title: "Skribo Essay",
-    description: "Writing process, analytics, and response.",
-    images: [{ url: "/og.png", width: 1200, height: 630 }],
+    type: "website",
+    siteName: "Scribo",
+    title: previewTitle,
+    description,
+    images: [previewImage],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Skribo Essay",
-    description: "Writing process, analytics, and response.",
-    images: ["/og.png"],
+    title: previewTitle,
+    description,
+    images: [previewImage],
   },
 };
 
