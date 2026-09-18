@@ -2,17 +2,17 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 const description = "Writing replay, process insights, and thoughtful feedback.";
-const previewTitle = "Scribo — The story behind every essay.";
+const previewTitle = "Skribo — The story behind every essay.";
 const previewImage = {
   url: "/og.png",
   width: 1200,
   height: 630,
-  alt: "Scribo: The story behind every essay. Writing replay. Process insights. Thoughtful feedback.",
+  alt: "Skribo: The story behind every essay. Writing replay. Process insights. Thoughtful feedback.",
 };
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://skribo-essay.andriisolonskyi.chatgpt.site"),
-  title: "Scribo",
+  title: "Skribo",
   description,
   icons: {
     icon: [
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    siteName: "Scribo",
+    siteName: "Skribo",
     title: previewTitle,
     description,
     images: [previewImage],

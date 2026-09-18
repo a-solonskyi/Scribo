@@ -20,11 +20,11 @@ export default function PolicyPage({
         Skip to policy
       </a>
       <header className="policy-site-header">
-        <a className="wordmark" href="/" aria-label="Scribo home">
+        <a className="wordmark" href="/" aria-label="Skribo home">
           [ˈskriː.boː]
         </a>
         <a className="policy-back-link" href="/">
-          Back to Scribo
+          Back to Skribo
         </a>
       </header>
       <div className="policy-grid">
@@ -62,7 +62,7 @@ export default function PolicyPage({
               Questions about this policy? Contact{' '}
               <a href={`mailto:${POLICY_CONTACT}`}>{POLICY_CONTACT}</a>.
             </p>
-            <a href="/">Back to Scribo</a>
+            <a href="/">Back to Skribo</a>
           </footer>
         </main>
       </div>

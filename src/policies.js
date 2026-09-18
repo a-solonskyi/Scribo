@@ -7,18 +7,18 @@ export const POLICIES = [
     slug: 'terms',
     title: 'Terms and conditions',
     introduction:
-      'The rules for using Scribo to write, review, and respond to essays.',
+      'The rules for using Skribo to write, review, and respond to essays.',
   },
   {
     slug: 'cookies',
     title: 'Cookies policy',
     introduction:
-      'How Scribo uses browser storage to save your work, and how provider-managed cookies differ.',
+      'How Skribo uses browser storage to save your work, and how provider-managed cookies differ.',
   },
   {
     slug: 'privacy',
     title: 'Privacy policy',
     introduction:
-      'What Scribo collects, who can access it, and the choices available to you.',
+      'What Skribo collects, who can access it, and the choices available to you.',
   },
 ];

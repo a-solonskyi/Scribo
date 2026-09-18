@@ -3,9 +3,9 @@ import type { Metadata } from 'next';
 import PolicyPage from '../policy-page';
 
 export const metadata: Metadata = {
-  title: 'Cookies policy | Scribo',
+  title: 'Cookies policy | Skribo',
   description:
-    'Browser draft storage, provider-managed cookies, storage duration, and your controls on Scribo.',
+    'Browser draft storage, provider-managed cookies, storage duration, and your controls on Skribo.',
 };
 
 export default function CookiesPage() {
@@ -21,14 +21,14 @@ export default function CookiesPage() {
           automatically attached to web requests.
         </p>
         <p>
-          Scribo’s application code does not set its own cookies. It uses the
+          Skribo’s application code does not set its own cookies. It uses the
           browser storage below to save writing progress and continue a guest
           draft after sign-in. For signed-in students, the application also
           sends drafts to its server through its save feature.
         </p>
       </section>
       <section>
-        <h2>2. Storage used by Scribo</h2>
+        <h2>2. Storage used by Skribo</h2>
         <p>
           In these names, <code>{'{assignmentToken}'}</code> identifies the
           assignment link and <code>{'{encodedUserId}'}</code> is the signed-in
@@ -111,10 +111,10 @@ export default function CookiesPage() {
       <section>
         <h2>3. Hosting and sign-in providers</h2>
         <p>
-          Scribo runs on OpenAI Sites with Cloudflare infrastructure and offers
+          Skribo runs on OpenAI Sites with Cloudflare infrastructure and offers
           ChatGPT sign-in. Hosting and sign-in services can manage cookies and
-          other storage outside Scribo’s source code, for example for
-          authentication, security, or delivery of their services. Scribo does
+          other storage outside Skribo’s source code, for example for
+          authentication, security, or delivery of their services. Skribo does
           not configure their cookie names or lifetimes, and this application
           inventory does not establish an exhaustive list of provider cookies.
         </p>
@@ -132,14 +132,14 @@ export default function CookiesPage() {
             Cloudflare’s Privacy policy
           </a>{' '}
           for their descriptions. Provider-wide notices do not mean every
-          technology described there runs on every Scribo page. Your browser’s
+          technology described there runs on every Skribo page. Your browser’s
           site-data controls show storage present in your own session.
         </p>
       </section>
       <section>
         <h2>4. Analytics and external websites</h2>
         <p>
-          Scribo does not include application-level advertising cookies,
+          Skribo does not include application-level advertising cookies,
           marketing pixels, visitor-analytics scripts, third-party
           error-reporting SDKs, or general browsing-session replay. Its
           educational writing replay is generated from editor events and is part
@@ -149,7 +149,7 @@ export default function CookiesPage() {
         <p>
           The YouTube tutorial, donation website, and research reference are
           outbound links, not embeds. Opening them takes you to another service
-          where its own storage rules apply. Scribo uses system fonts and
+          where its own storage rules apply. Skribo uses system fonts and
           bundled interface icons rather than externally loaded font or icon
           services.
         </p>
@@ -161,7 +161,7 @@ export default function CookiesPage() {
           browser settings. Clearing only cookies may leave local drafts intact;
           to remove those, clear this website’s local storage or site data too.
           Clearing browser storage does not delete account drafts or submitted
-          work held on Scribo’s server.
+          work held on Skribo’s server.
         </p>
         <p>
           Download important work before clearing storage. Blocking browser
@@ -171,7 +171,7 @@ export default function CookiesPage() {
         </p>
         <p>
           Signing out ends your use of the signed-in session but does not erase
-          saved browser backups or server records. Scribo has no in-app cookie
+          saved browser backups or server records. Skribo has no in-app cookie
           preference panel. For questions or requests concerning server-held
           information, contact the operator using the email above.
         </p>

@@ -3,9 +3,9 @@ import type { Metadata } from 'next';
 import PolicyPage from '../policy-page';
 
 export const metadata: Metadata = {
-  title: 'Privacy policy | Scribo',
+  title: 'Privacy policy | Skribo',
   description:
-    'Information collected by Scribo, writing-process records, access, storage, deletion, and privacy requests.',
+    'Information collected by Skribo, writing-process records, access, storage, deletion, and privacy requests.',
 };
 
 export default function PrivacyPage() {
@@ -14,7 +14,7 @@ export default function PrivacyPage() {
       <section>
         <h2>1. Scope and responsibility</h2>
         <p>
-          This policy describes the information handled through Scribo, the
+          This policy describes the information handled through Skribo, the
           essay-writing and professor-feedback service operated by Andrii
           Solonskyi in Ukraine. It covers professors, students who sign in, and
           students who write as guests. It also explains where provider services
@@ -22,7 +22,7 @@ export default function PrivacyPage() {
           the application.
         </p>
         <p>
-          If a professor or institution asks you to use Scribo, ask them about
+          If a professor or institution asks you to use Skribo, ask them about
           their course requirements, assessment practices, and any separate
           handling of your information.
         </p>
@@ -35,7 +35,7 @@ export default function PrivacyPage() {
             user identifier and email address, and a name when available.
             Approved professor records store the identifier, email, display
             name, and activation date. Signed-in student drafts are associated
-            with the user identifier. Scribo does not receive your ChatGPT
+            with the user identifier. Skribo does not receive your ChatGPT
             password or retrieve your ChatGPT conversations.
           </li>
           <li>
@@ -84,7 +84,7 @@ export default function PrivacyPage() {
           </li>
         </ul>
         <p>
-          Scribo has no file-upload feature. Essay text entered or pasted into
+          Skribo has no file-upload feature. Essay text entered or pasted into
           the editor is content collected by the application. PDF, text, and
           Markdown files offered by the interface are generated as downloads in
           your browser.
@@ -103,7 +103,7 @@ export default function PrivacyPage() {
           information is used to respond to questions and requests.
         </p>
         <p>
-          Writing records concern activity inside the essay editor. Scribo does
+          Writing records concern activity inside the essay editor. Skribo does
           not install general browsing-session recording, advertising trackers,
           visitor-analytics scripts, or a third-party error-reporting SDK. It
           does not automatically send essays to an AI API or run AI analysis.
@@ -139,16 +139,16 @@ export default function PrivacyPage() {
           Professors can download annotated responses and a Markdown AI-review
           prompt containing the student’s name, essay, assignment details, and
           available process records, including submission device details in the
-          statistics. Scribo generates these files locally and does not
+          statistics. Skribo generates these files locally and does not
           automatically upload them anywhere. A professor may choose to share an
           export separately; ask that professor about the recipient and purpose.
-          Copies held outside Scribo are not controlled by its deletion buttons.
+          Copies held outside Skribo are not controlled by its deletion buttons.
         </p>
       </section>
       <section>
         <h2>5. Storage and service providers</h2>
         <p>
-          Scribo is hosted through OpenAI Sites on Cloudflare infrastructure.
+          Skribo is hosted through OpenAI Sites on Cloudflare infrastructure.
           Server-held professor records, classes, assignments, account drafts,
           submissions, and annotations are stored in a Cloudflare D1 database.
           No file-storage bucket or upload service is connected. Browser draft
@@ -158,7 +158,7 @@ export default function PrivacyPage() {
         <p>
           ChatGPT provides sign-in. OpenAI and Cloudflare control parts of
           hosting, authentication, request handling, and operational logging
-          outside Scribo’s application code. Their practices are described in{' '}
+          outside Skribo’s application code. Their practices are described in{' '}
           <a href="https://openai.com/policies/privacy-policy/">
             OpenAI’s Privacy policy
           </a>{' '}
@@ -180,11 +180,11 @@ export default function PrivacyPage() {
           uses system fonts.
         </p>
         <p>
-          Scribo has no payment processor or subscription system and does not
+          Skribo has no payment processor or subscription system and does not
           request payment-card details. Optional developer support uses
           displayed bank-transfer details; the Ukraine-support option links to
           Come Back Alive. Any transfer information handled by banks or
-          recipients is outside Scribo’s application database.
+          recipients is outside Skribo’s application database.
         </p>
       </section>
       <section>
@@ -227,7 +227,7 @@ export default function PrivacyPage() {
           data does not remove server-held information. There is no self-service
           control to delete an account or an individual server draft, and no
           automatic process linking deletion of a ChatGPT account to deletion of
-          Scribo records.
+          Skribo records.
         </p>
         <p>
           Application deletion controls do not establish when provider-managed
@@ -265,7 +265,7 @@ export default function PrivacyPage() {
       <section>
         <h2>8. Policy updates</h2>
         <p>
-          This page will be updated when Scribo’s information-handling practices
+          This page will be updated when Skribo’s information-handling practices
           change. The date above identifies the latest revision. Use the contact
           email above for questions about this policy or how it applies to your
           work.

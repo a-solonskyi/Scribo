@@ -88,7 +88,7 @@ export default function AIPromptTab({ submission, stats, eventLog, pasteEvents, 
           <h2 id="ai-prompt-title">Academic integrity review prompt</h2>
           <p>
             Create a Markdown file containing the review instructions, all available writing
-            records, and the final essay. Scribo does not run an AI analysis or send this data
+            records, and the final essay. Skribo does not run an AI analysis or send this data
             anywhere.
           </p>
           <p className="ai-prompt-note">
