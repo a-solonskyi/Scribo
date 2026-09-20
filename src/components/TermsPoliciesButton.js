@@ -15,8 +15,11 @@ export default function TermsPoliciesButton() {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger className="terms-policies-button" ref={triggerRef}>
-        Terms &amp; Policies
+      <PopoverTrigger
+        className="sidebar-action-button sidebar-action-button-inverse terms-policies-button"
+        ref={triggerRef}
+      >
+        <span>Terms &amp; Policies</span>
       </PopoverTrigger>
       <PopoverContent
         className="policies-popover"

@@ -20,7 +20,7 @@ Reviewed 16 September 2026. Operator supplied by the user: Andrii Solonskyi, Ukr
 | Deletion | Class/assignment deletion cascades through related records, including account drafts. Submission deletion cascades annotations, not separate account drafts. Submitted account drafts retain submitted status. No account-deletion endpoint or scheduled cleanup. No automatic deletion when a ChatGPT account is deleted. | API DELETE handlers, `db/schema.ts`, both SQL migrations, submission transaction |
 | Environment | Runtime binding `DB`; hosting `r2: null`. Tooling-only names include `CODEX_SANDBOX`, `WRANGLER_WRITE_LOGS`, `WRANGLER_LOG_PATH`, `MINIFLARE_REGISTRY_PATH`. No application AI/payment secret reference. Secret values were not used in policy content. | `vite.config.ts`, `db/index.ts`, hosting configuration |
 
-The audit includes the pre-existing local account-draft, instructions, and deadline changes in this checkout. It does not roll back or independently redesign those features.
+The audit includes the account-draft, instructions, and deadline features. Publication applies only the policy changes to the latest saved site source; concurrent local deadline-visual experiments are preserved locally and excluded from this release.
 
 ## Provider references reviewed
 
@@ -32,7 +32,7 @@ These notices are linked for provider practices, not treated as proof that every
 
 ## Implementation
 
-Three explicit public App Router routes render policy content without importing the authenticated application, querying its database, or loading its session. Shared page chrome identifies the operator, update date, current document, and website return link. Next links provide policy-to-policy navigation.
+Three explicit public App Router routes render policy content without importing the authenticated application, querying its database, or loading its session. Shared page chrome identifies the operator, update date, current document, and website return link. Native anchors provide policy-to-policy navigation and return links using full document loads.
 
 The professor-only sidebar button sits directly below Donate, has a transparent background, and reuses the existing Base UI popover wrapper. Public/sign-in links use the same link component. Popover and sign-in links open new tabs with `noopener noreferrer` and a screen-reader new-tab indication. In-document navigation stays in the current tab.
 
@@ -44,7 +44,7 @@ The professor-only sidebar button sits directly below Donate, has a transparent 
 - Desktop and mobile UI inspected, including 375px policy pages and 320px sign-in layout; no horizontal overflow observed. Existing application theme is light only.
 - Popover tested in a temporary local professor-layout fixture without granting API access. Enter opened it and focused the first document; Tab moved through document links; Escape and Close dismissed it and restored the trigger; outside click dismissed it. Button computed background was transparent. Fixture removed before build/publication.
 - All three popover links opened the matching policy in separate Chrome tabs. The public links use the same tested component and were checked for destinations and attributes; the public page has no professor policy button.
-- All 24 existing tests passed. TypeScript passed. Targeted lint for every policy-related source file passed. Repository-wide lint has pre-existing errors in unrelated components and utilities.
+- All 24 tests in the local checkout passed. The isolated publication source also passed its existing test suite. TypeScript passed. Targeted lint for every policy-related source file passed. Repository-wide lint has pre-existing errors in unrelated components and utilities.
 
 ## Separate operational decisions
 
@@ -52,3 +52,9 @@ The professor-only sidebar button sits directly below Donate, has a transparent 
 2. Decide a server-record retention schedule and whether to add account/draft deletion controls. Currently requests are handled through the operator contact, and no timed cleanup exists.
 3. Consider explicitly informing students, before writing/submission, that detailed writing history and submission IP/country/OS are available to the professor. No new consent flow or banner was added in this task.
 4. Local account backups survive logout. A future shared-device cleanup feature would need a separate decision to avoid destroying unsaved work.
+
+## Navigation correction — 17 September 2026
+
+The published vinext `next/link` handler threw `TypeError: e is not a function` on Back to Scribo; client prefetch also failed. The development preview did not reproduce the production failure. Replaced Next links throughout the policy documents with native anchors, retaining same-tab navigation and standard browser history. Both return links and the wordmark now use full document navigation, including when returning to the React Router application. Policy content and its last-updated date are unchanged.
+
+Regression verification: the compiled production build successfully returned to sign-in from the header/footer links, all three documents, keyboard activation, and the wordmark. Policy-to-policy navigation and browser Back passed. The signed-in development session returned to the professor dashboard. TypeScript, policy-file lint, diff checks, and production build passed.

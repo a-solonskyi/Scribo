@@ -1,19 +1,7 @@
-.deadline-wine-trigger {
-  display: block;
-  width: 100%;
-  padding: 4px 0 0;
-  border: 0;
-  color: #000;
-  background: transparent;
-  text-align: left;
-  transition: opacity 250ms;
-}
-.deadline-wine-trigger:focus-visible, .wine-close:focus-visible {
+.wine-close:focus-visible {
   outline: 1px solid #000;
   outline-offset: 6px;
 }
-.deadline-field-text { display: block; }
-.deadline-wine-trigger.is-transformed { pointer-events: none; }
 .is-transformed .deadline-field-text { animation: deadline-into-ink 650ms ease-in forwards; }
 .deadline-wine { position: fixed; z-index: 30; pointer-events: none; }
 .wine-scene { display: block; width: 100%; height: 100%; overflow: visible; }

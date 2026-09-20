@@ -1,4 +1,4 @@
-import Link from 'next/link';
+/* oxlint-disable next/no-html-link-for-pages -- Use document navigation: vinext's production Link handler fails on these public routes. */
 import {
   POLICIES,
   POLICY_CONTACT,
@@ -20,25 +20,25 @@ export default function PolicyPage({
         Skip to policy
       </a>
       <header className="policy-site-header">
-        <Link className="wordmark" href="/" aria-label="Scribo home">
+        <a className="wordmark" href="/" aria-label="Skribo home">
           [ˈskriː.boː]
-        </Link>
-        <Link className="policy-back-link" href="/">
-          Back to Scribo
-        </Link>
+        </a>
+        <a className="policy-back-link" href="/">
+          Back to Skribo
+        </a>
       </header>
       <div className="policy-grid">
         <aside className="policy-navigation">
           <p>Terms &amp; Policies</p>
           <nav aria-label="Policy documents">
             {POLICIES.map((item) => (
-              <Link
+              <a
                 key={item.slug}
                 href={`/policies/${item.slug}`}
                 aria-current={item.slug === slug ? 'page' : undefined}
               >
                 {item.title}
-              </Link>
+              </a>
             ))}
           </nav>
         </aside>
@@ -62,7 +62,7 @@ export default function PolicyPage({
               Questions about this policy? Contact{' '}
               <a href={`mailto:${POLICY_CONTACT}`}>{POLICY_CONTACT}</a>.
             </p>
-            <Link href="/">Back to Scribo</Link>
+            <a href="/">Back to Skribo</a>
           </footer>
         </main>
       </div>

@@ -138,7 +138,7 @@ export default function LoginPage({ session }) {
             Watch tutorial
           </button>
         </div>
-        <div className="auth-features" aria-label="Scribo features">
+        <div className="auth-features" aria-label="Skribo features">
           {FEATURES.map(([title, description]) => (
             <section className="auth-feature" key={title}>
               <h2>{title}</h2>
@@ -206,7 +206,7 @@ export default function LoginPage({ session }) {
                 Close
               </button>
             </header>
-            <p>Enter the invitation code to open the Scribo tutorial.</p>
+            <p>Enter the invitation code to open the Skribo tutorial.</p>
             <form className="auth-tutorial-form" onSubmit={handleTutorialAccess}>
               <label>
                 <span>Invitation code</span>

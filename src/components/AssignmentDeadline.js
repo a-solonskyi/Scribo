@@ -1,17 +1,43 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { formatDateTime } from "../utils/timeFormatting";
 import { formatTimeLeft } from "../utils/deadlines";
-import DeadlineWine from "./DeadlineWine";
-import LiquidDeadlineWine from "./LiquidDeadlineWine";
+import "./assignment-deadline.css";
 
-export default function AssignmentDeadline({ deadline, startedAt, variant, progressOverride, displayNow, contained = false, initiallyOpen = false }) {
+// Separate import factories keep each renderer's CSS attached to its own chunk.
+// A conditional import expression can make the production preloader use only
+// the final branch's stylesheet list.
+const loadAnimation = {
+  liquid: () => import("./LiquidDeadlineWine"),
+  original: () => import("./DeadlineWine"),
+};
+
+export default function AssignmentDeadline({ deadline, startedAt, variant, progressOverride, displayNow, contained = false, initiallyOpen = false, motionRate = 1 }) {
   const [now, setNow] = useState(Date.now);
   const [open, setOpen] = useState(initiallyOpen);
+  const [loaded, setLoaded] = useState(null);
+  const [loadError, setLoadError] = useState("");
   const anchor = useRef(null);
+  const isLiquid = variant === "liquid" || variant === "liquid-previous";
+  const kind = isLiquid ? "liquid" : "original";
+  const Animation = loaded?.kind === kind ? loaded.Component : null;
   const close = useCallback(() => {
     setOpen(false);
     anchor.current?.focus({ preventScroll: true });
   }, []);
+  useEffect(() => {
+    if (!open || !variant || Animation) return;
+    let cancelled = false;
+    // Keep both the renderer and its styles out of the initial page load.
+    loadAnimation[kind]().then(({ default: Component }) => {
+      if (!cancelled) setLoaded({ kind, Component });
+    }).catch(() => {
+      if (!cancelled) {
+        setOpen(false);
+        setLoadError("The animation couldn’t load. Click the deadline to try again.");
+      }
+    });
+    return () => { cancelled = true; };
+  }, [open, variant, isLiquid, kind, Animation]);
   useEffect(() => {
     if (!deadline) return;
     const update = () => setNow(Date.now());
@@ -26,16 +52,16 @@ export default function AssignmentDeadline({ deadline, startedAt, variant, progr
   if (!deadline || Number.isNaN(new Date(deadline).getTime())) return null;
   const contents = <>
     <span className="deadline-label">Deadline / Time left</span>
-    <span><time dateTime={deadline}>{formatDateTime(deadline)}</time><span aria-hidden="true"> / </span><span>{formatTimeLeft(deadline, displayNow ?? now)}</span></span>
+    <time className="deadline-date" dateTime={deadline}>{formatDateTime(deadline)}</time>
+    <span className="deadline-time-left">{formatTimeLeft(deadline, displayNow ?? now)}</span>
   </>;
-  // No direction is selected for the live UI. All three can be tried on the prototype route.
   if (!variant) return <div className="assignment-deadline">{contents}</div>;
-  const Animation = variant === "liquid" ? LiquidDeadlineWine : DeadlineWine;
   return <>
-    <button ref={anchor} type="button" className={`assignment-deadline deadline-wine-trigger${variant === "liquid" ? " liquid-trigger" : ""}${open ? " is-transformed" : ""}`}
-      onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-label="Deadline / Time left — pour time into a glass">
+    <button ref={anchor} type="button" className={`assignment-deadline deadline-wine-trigger${isLiquid ? " liquid-trigger" : ""}${open && Animation ? " is-transformed" : ""}`}
+      onClick={() => { setLoadError(""); setOpen((value) => !value); }} aria-expanded={open && !!Animation} aria-busy={open && !Animation}>
       <span className="deadline-field-text">{contents}</span>
     </button>
-    {open && <Animation variant={variant} anchor={anchor} startedAt={startedAt} deadline={deadline} progressOverride={progressOverride} onClose={close} contained={contained} />}
+    {loadError && <span role="status" className="deadline-load-error">{loadError}</span>}
+    {open && Animation && <Animation variant={variant} anchor={anchor} startedAt={startedAt} deadline={deadline} progressOverride={progressOverride} onClose={close} contained={contained} motionRate={motionRate} />}
   </>;
 }

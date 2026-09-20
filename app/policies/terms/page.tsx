@@ -1,30 +1,30 @@
-import Link from 'next/link';
+/* oxlint-disable next/no-html-link-for-pages -- Use document navigation: vinext's production Link handler fails on these public routes. */
 import type { Metadata } from 'next';
 import PolicyPage from '../policy-page';
 
 export const metadata: Metadata = {
-  title: 'Terms and conditions | Scribo',
+  title: 'Terms and conditions | Skribo',
   description:
-    'Terms for essay writing, process review, professor access, and donations on Scribo.',
+    'Terms for essay writing, process review, professor access, and donations on Skribo.',
 };
 
 export default function TermsPage() {
   return (
     <PolicyPage slug="terms">
       <section>
-        <h2>1. About Scribo and these terms</h2>
+        <h2>1. About Skribo and these terms</h2>
         <p>
-          Scribo (also displayed as Skribo Essay) is an educational tool for
+          Skribo is an educational tool for
           assigning essays, writing them in a browser, reviewing the writing
           process, and providing professor feedback. These terms govern your use
           of the service operated by Andrii Solonskyi in Ukraine. By using
-          Scribo, you agree to these terms. If you do not agree, do not use the
+          Skribo, you agree to these terms. If you do not agree, do not use the
           service.
         </p>
         <p>
-          The <Link href="/policies/privacy">Privacy policy</Link> explains how
+          The <a href="/policies/privacy">Privacy policy</a> explains how
           information is handled, and the{' '}
-          <Link href="/policies/cookies">Cookies policy</Link> explains browser
+          <a href="/policies/cookies">Cookies policy</a> explains browser
           storage.
         </p>
       </section>
@@ -32,7 +32,7 @@ export default function TermsPage() {
         <h2>2. Access and accounts</h2>
         <p>
           Professors sign in with ChatGPT and enter a valid invitation code to
-          activate their workspace. Scribo receives an account identifier, email
+          activate their workspace. Skribo receives an account identifier, email
           address, and name when supplied by the sign-in provider. It does not
           create or store your ChatGPT password. Keep your account access and
           invitation code secure, and use only access you are authorised to use.
@@ -62,7 +62,7 @@ export default function TermsPage() {
           the service.
         </p>
         <p>
-          Professors are responsible for deciding whether Scribo is appropriate
+          Professors are responsible for deciding whether Skribo is appropriate
           for their course, explaining the collection of writing-process data to
           students, and meeting their institution’s requirements for handling
           student information. Share or export student work only when you are
@@ -90,7 +90,7 @@ export default function TermsPage() {
       <section>
         <h2>5. Writing records and educational decisions</h2>
         <p>
-          Scribo records changes made inside the essay editor, including
+          Skribo records changes made inside the essay editor, including
           inserted text, deletions, pasted text, timing, and pauses. Its replay
           and statistics support review of how an essay developed. They are not
           conclusive proof of authorship, misconduct, or use of AI. Professors
@@ -99,7 +99,7 @@ export default function TermsPage() {
         </p>
         <p>
           The AI prompt feature produces a file for the professor to download.
-          Scribo does not run an AI analysis or automatically transmit essays to
+          Skribo does not run an AI analysis or automatically transmit essays to
           an AI service. A professor who uploads an export elsewhere is
           responsible for that disclosure and for reviewing the recipient’s
           terms.
@@ -122,27 +122,27 @@ export default function TermsPage() {
           draft. Downloaded copies are outside these controls.
         </p>
         <p>
-          You can stop using Scribo at any time. Signing out does not delete
+          You can stop using Skribo at any time. Signing out does not delete
           your records or browser backups. There is no self-service
           account-deletion control or scheduled automatic deletion. To request
           account or data deletion, contact the operator at the email above;
           students may also contact their professor about submitted work.
-          Deleting a ChatGPT account does not itself invoke a Scribo deletion
+          Deleting a ChatGPT account does not itself invoke a Skribo deletion
           process.
         </p>
       </section>
       <section>
         <h2>7. Payments and voluntary support</h2>
         <p>
-          Scribo currently has no paid plan, subscription, checkout, or
+          Skribo currently has no paid plan, subscription, checkout, or
           recurring billing. The Donate menu displays bank-transfer details for
           supporting the developer and a link to the separate Come Back Alive
           donation website. Donations are optional and do not purchase access or
           a service entitlement.
         </p>
         <p>
-          Transfers are handled outside Scribo by your bank or the external
-          donation service. Scribo does not collect payment-card details or
+          Transfers are handled outside Skribo by your bank or the external
+          donation service. Skribo does not collect payment-card details or
           process cancellations or refunds. Contact your bank, the relevant
           recipient, or the external service about a transfer.
         </p>
@@ -150,12 +150,12 @@ export default function TermsPage() {
       <section>
         <h2>8. External providers and links</h2>
         <p>
-          Scribo uses OpenAI Sites hosting, ChatGPT sign-in, and Cloudflare
+          Skribo uses OpenAI Sites hosting, ChatGPT sign-in, and Cloudflare
           infrastructure and database services. Their services have their own
           terms and privacy information. The tutorial opens on YouTube after an
           invitation-code check. Donation and research links also take you to
           external websites; these are links, not embedded services. Third-party
-          availability and practices are outside Scribo’s application controls.
+          availability and practices are outside Skribo’s application controls.
         </p>
       </section>
       <section>
@@ -169,7 +169,7 @@ export default function TermsPage() {
         </p>
         <p>
           Changes to these terms will be published on this page with an updated
-          date. Review them when deciding whether to continue using Scribo.
+          date. Review them when deciding whether to continue using Skribo.
           Contact the operator about access problems, these terms, or concerns
           about use of the service.
         </p>

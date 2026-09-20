@@ -1,0 +1,16 @@
+.deadline-wine-trigger {
+  display: block;
+  width: 100%;
+  padding: 4px 0 0;
+  border: 0;
+  color: #000;
+  background: transparent;
+  text-align: left;
+}
+.deadline-wine-trigger:focus-visible {
+  outline: 1px solid #000;
+  outline-offset: 6px;
+}
+.deadline-field-text, .deadline-date, .deadline-time-left { display: block; }
+.deadline-wine-trigger.is-transformed { pointer-events: none; }
+.deadline-load-error { display: block; margin-top: 8px; font-size: 0.75rem; }

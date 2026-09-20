@@ -707,16 +707,31 @@ button:disabled {
   margin-top: auto;
 }
 
+.sidebar-account {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
 .sidebar-email {
-  margin: 2px 0 0;
+  min-width: 0;
+  margin: 0;
   color: var(--medium-gray);
   font-size: 11px;
   overflow-wrap: anywhere;
 }
 
 .sidebar-logout-button {
-  width: fit-content;
-  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  margin-left: auto;
+  margin-right: -12px;
+  padding: 7px;
   border: 0;
   background: transparent;
   color: var(--medium-gray);
@@ -730,22 +745,31 @@ button:disabled {
   color: var(--ink);
 }
 
-.terms-policies-button {
-  display: block;
-  width: fit-content;
-  min-height: 36px;
-  padding: 4px 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: var(--ink);
-  font-size: 14px;
-  line-height: 1.4;
-  letter-spacing: 0.025em;
-  text-align: left;
+.sidebar-logout-button:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 2px;
 }
 
-.terms-policies-button:hover { text-decoration: underline; text-underline-offset: 4px; }
+.sidebar-action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 40px;
+  padding: 10px 14px;
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.19;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-decoration: none;
+}
+
+.sidebar-action-button-inverse { background: var(--canvas); color: var(--ink); }
+.sidebar-action-button-inverse:hover { background: var(--selection); }
+.sidebar-action-button:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
 .policies-popover {
   width: min(290px, calc(100vw - 32px));
   max-height: var(--available-height);

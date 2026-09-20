@@ -12,6 +12,7 @@ export async function GET(_request: Request, { params }: Context) {
     topic: assignments.topic,
     instructions: assignments.instructions,
     deadline: assignments.deadline,
+    createdAt: assignments.createdAt,
     publicToken: assignments.publicToken,
   }).from(assignments).where(eq(assignments.publicToken, publicToken)).limit(1);
   if (!row) return errorResponse("Essay link not found.", 404);
@@ -20,6 +21,7 @@ export async function GET(_request: Request, { params }: Context) {
     topic: row.topic,
     instructions: row.instructions,
     deadline: row.deadline,
+    created_at: row.createdAt,
     public_token: row.publicToken,
   });
 }

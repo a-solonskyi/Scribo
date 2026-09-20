@@ -21,7 +21,7 @@ function morphPath(from, to, amount) {
   return from.map(([x, y], i) => `${i ? "L" : "M"}${x + (to[i][0] - x) * amount},${y + (to[i][1] - y) * amount}`).join(" ") + "Z";
 }
 
-export default function DeadlineWine({ variant, anchor, startedAt, deadline, progressOverride, onClose, contained = false }) {
+export default function DeadlineWine({ variant, anchor, startedAt, deadline, progressOverride, onClose, contained = false, motionRate = 1 }) {
   const glassVariant = variant === "hybrid" ? "line" : variant;
   const id = useId().replace(/:/g, "");
   const morphRef = useRef(null);
@@ -45,7 +45,7 @@ export default function DeadlineWine({ variant, anchor, startedAt, deadline, pro
       const container = contained ? anchor.current.closest(".deadline-comparison-stage") : null;
       if (container) {
         const bounds = container.getBoundingClientRect();
-        setGeometry({ left: rect.left - bounds.left, top: rect.top - bounds.top, height: bounds.bottom - rect.top - 8, scale: 1, container });
+        setGeometry({ left: rect.left - bounds.left, top: rect.top - bounds.top, height: bounds.bottom - rect.top - 8, scale: bounds.width < 280 ? 0.72 : 0.9, container });
         return;
       }
       const mobile = window.innerWidth <= 700;
@@ -89,7 +89,7 @@ export default function DeadlineWine({ variant, anchor, startedAt, deadline, pro
     const bottle = samplePath(bottlePath);
     function draw(time) {
       if (disposed) return;
-      const elapsed = time - started;
+      const elapsed = (time - started) * motionRate;
       const done = morphComplete.current || reducedMotion || elapsed >= 1650;
       const rawProgress = progressRef.current ?? deadlineProgress(startedAt, deadline);
       const fill = deadlineFill(rawProgress);
@@ -134,7 +134,7 @@ export default function DeadlineWine({ variant, anchor, startedAt, deadline, pro
       cancelAnimationFrame(frame);
       document.removeEventListener("visibilitychange", resume);
     };
-  }, [geometry, variant, reducedMotion, startedAt, deadline, bowlTop, bowlBottom]);
+  }, [geometry, variant, reducedMotion, startedAt, deadline, bowlTop, bowlBottom, motionRate]);
 
   if (!geometry) return null;
   const overflowing = progressOverride > 1;

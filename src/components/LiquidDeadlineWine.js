@@ -1,10 +1,11 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { deadlineFill, deadlineProgress } from "../utils/deadlineProgress";
-import { clamp, createDeadlineInk, deadlineBottlePath, deadlineStreamPath, ease } from "../utils/liquidDeadline";
+import { clamp, createDeadlineInk, createPreviousDeadlineInk, deadlineBottlePath, deadlineStreamPath, ease } from "../utils/liquidDeadline";
+import "./deadline-wine.css";
 import "./liquid-deadline-wine.css";
 
-export default function LiquidDeadlineWine({ anchor, deadline, startedAt, progressOverride, onClose, contained = false }) {
+export default function LiquidDeadlineWine({ anchor, deadline, startedAt, progressOverride, onClose, contained = false, motionRate = 1, variant = "liquid" }) {
   const id = useId().replace(/:/g, "");
   const root = useRef(null);
   const canvas = useRef(null);
@@ -25,7 +26,7 @@ export default function LiquidDeadlineWine({ anchor, deadline, startedAt, progre
       if (!rect) return;
       const container = contained ? anchor.current.closest(".deadline-comparison-stage") : null;
       const bounds = container?.getBoundingClientRect();
-      const scale = !contained && window.innerWidth <= 700 ? 0.65 : 1;
+      const scale = bounds ? (bounds.width < 280 ? 0.72 : 0.9) : window.innerWidth <= 700 ? 0.65 : 1;
       const top = bounds ? rect.top - bounds.top : rect.top;
       setGeometry({ container, scale, left: bounds ? rect.left - bounds.left : rect.left, top,
         height: Math.max(330, (bounds ? bounds.height : window.innerHeight) - top - (bounds ? 8 : 30)) });
@@ -47,26 +48,27 @@ export default function LiquidDeadlineWine({ anchor, deadline, startedAt, progre
   useEffect(() => {
     if (!geometry || !canvas.current) return;
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const drawInk = createDeadlineInk(anchor.current, canvas.current, geometry.scale);
+    const createInk = variant === "liquid-previous" ? createPreviousDeadlineInk : createDeadlineInk;
+    const drawInk = createInk(anchor.current, canvas.current, geometry.scale);
     // Hide the real text only after its pixels have been captured and the first frame painted.
-    drawInk(0);
+    drawInk(completed.current ? 1 : 0);
     anchor.current.classList.add("ink-captured");
     let frame;
     let lastTime = performance.now();
     let elapsed = completed.current ? 3000 : 0;
     let phase = 0;
-    let lastProgress = null;
     function draw(time) {
       const delta = Math.min(64, time - lastTime);
       lastTime = time;
-      elapsed += delta;
-      if (!motion.matches) phase += delta / 750;
+      elapsed += delta * motionRate;
+      if (!motion.matches) phase += delta * motionRate / 750;
       const t = motion.matches ? 1 : clamp(elapsed / 2600);
       if (!completed.current) drawInk(t);
       if (t >= 1 && !completed.current) {
         completed.current = true;
-        root.current.dataset.phase = "pouring";
       }
+      root.current.dataset.phase = t >= 1 ? "pouring" : "morphing";
+      root.current.dataset.morph = t.toFixed(3);
       canvas.current.style.opacity = t >= 1 ? "0" : "1";
       bottle.current.style.opacity = t >= 1 ? "1" : "0";
       glass.current.style.opacity = String(ease((t - 0.55) / 0.4));
@@ -96,11 +98,8 @@ export default function LiquidDeadlineWine({ anchor, deadline, startedAt, progre
           drop.setAttribute("opacity", String(Math.sin(Math.PI * age)));
         });
       }
-      if (raw !== lastProgress) {
-        root.current.dataset.progress = String(raw);
-        root.current.dataset.overflow = String(overflowing);
-        lastProgress = raw;
-      }
+      root.current.dataset.progress = String(raw);
+      root.current.dataset.overflow = String(overflowing);
       frame = requestAnimationFrame(draw);
     }
     const resume = () => {
@@ -112,7 +111,7 @@ export default function LiquidDeadlineWine({ anchor, deadline, startedAt, progre
     document.addEventListener("visibilitychange", resume);
     const button = anchor.current;
     return () => { cancelAnimationFrame(frame); document.removeEventListener("visibilitychange", resume); button?.classList.remove("ink-captured"); };
-  }, [anchor, geometry, bowlTop, bowlBottom, deadline, startedAt]);
+  }, [anchor, geometry, bowlTop, bowlBottom, deadline, startedAt, motionRate, variant]);
 
   if (!geometry) return null;
   return createPortal(<div ref={root} className={`deadline-wine liquid-deadline-wine${contained ? " wine-contained" : ""}`} data-phase="morphing"

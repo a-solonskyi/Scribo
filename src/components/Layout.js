@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
+import { LogOut } from "lucide-react";
 
 import { signOutProfessor } from "../sites/auth";
 import { getAssignment, getClasses, getSubmission } from "../sites/database";
 import TermsPoliciesButton from "./TermsPoliciesButton";
+import InstructionsButton from "./InstructionsButton";
 
 export default function Layout({ children, session }) {
   const location = useLocation();
@@ -183,7 +185,7 @@ export default function Layout({ children, session }) {
               </section>
             ) : null}
             <button
-              className="filled-button sidebar-donate-button"
+              className="filled-button sidebar-action-button sidebar-donate-button"
               type="button"
               aria-expanded={Boolean(donationView)}
               onClick={() =>
@@ -193,11 +195,22 @@ export default function Layout({ children, session }) {
               Donate
             </button>
           </div>
-          {session?.approved ? <TermsPoliciesButton /> : null}
-          <p className="sidebar-email">{session?.user?.email}</p>
-          <button className="sidebar-logout-button" type="button" onClick={handleLogout}>
-            Logout
-          </button>
+          {session?.approved ? <>
+            <TermsPoliciesButton />
+            <InstructionsButton />
+          </> : null}
+          <div className="sidebar-account">
+            <p className="sidebar-email">{session?.user?.email}</p>
+            <button
+              className="sidebar-logout-button"
+              type="button"
+              aria-label="Log out"
+              title="Log out"
+              onClick={handleLogout}
+            >
+              <LogOut size={14} strokeWidth={1.6} aria-hidden="true" />
+            </button>
+          </div>
         </div>
       </aside>
       <main className="platform-main">{children}</main>
