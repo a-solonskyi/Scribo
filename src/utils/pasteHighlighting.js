@@ -3,6 +3,7 @@ import {
   reconstructOriginMap,
   sanitizeOriginRanges,
 } from "./characterOrigins.js";
+import { applyWritingEvent, orderWritingEvents } from "./writingHistory.js";
 
 export function getHighlightedSegments(
   finalText,
@@ -288,22 +289,12 @@ function getPasteRangesFromEvents(finalText, eventLog = [], pasteEvents = []) {
   if (!finalText || !eventLog.length) return null;
 
   const originMap = reconstructOriginMap(eventLog, pasteEvents);
-  const sortedEvents = [...eventLog].sort(
-    (a, b) => (a.timestamp_ms || 0) - (b.timestamp_ms || 0)
-  );
+  const sortedEvents = orderWritingEvents(eventLog);
   let reconstructedText = "";
 
   for (const event of sortedEvents) {
-    const position = Math.max(
-      0,
-      Math.min(reconstructedText.length, event.position || 0)
-    );
-    const deletedCount = Math.max(0, event.deleted_character_count || 0);
-    const insertedText = event.inserted_text || event.pasted_text || "";
-    reconstructedText =
-      reconstructedText.slice(0, position) +
-      insertedText +
-      reconstructedText.slice(position + deletedCount);
+    try { reconstructedText = applyWritingEvent(reconstructedText, event); }
+    catch { return null; }
   }
 
   if (reconstructedText !== finalText) return null;

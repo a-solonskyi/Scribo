@@ -1,5 +1,6 @@
 import { getTextStats } from "./textStats.js";
 import { BULK_INSERT_PASTE_THRESHOLD } from "./characterOrigins.js";
+import { getWritingTimeline } from "./writingHistory.js";
 
 export const PAUSE_THRESHOLD_MS = 5000;
 
@@ -112,7 +113,7 @@ export function computeSubmissionStats({
   pauseEvents = [],
 }) {
   const textStats = getTextStats(finalText);
-  const sortedEvents = [...eventLog].sort((a, b) => a.timestamp_ms - b.timestamp_ms);
+  const sortedEvents = getWritingTimeline(eventLog);
   const firstEvent = sortedEvents[0];
   const lastEvent = sortedEvents[sortedEvents.length - 1];
   const writingDurationMs = lastEvent ? lastEvent.timestamp_ms : 0;

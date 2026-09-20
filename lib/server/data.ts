@@ -1,6 +1,8 @@
 import { and, eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { assignments, classes, responseAnnotations, submissions } from "@/db/schema";
+import { decodeSubmissionHistory } from "@/src/utils/submissionHistory";
+import { validateWritingHistory } from "@/src/utils/writingHistory";
 
 export function parseJson(value: string | null, fallback: unknown) {
   if (!value) return fallback;
@@ -45,10 +47,18 @@ export function serializeAssignment(row: typeof assignments.$inferSelect, classN
   };
 }
 
-export function serializeSubmission(
+export async function serializeSubmission(
   row: typeof submissions.$inferSelect,
   assignment?: typeof assignments.$inferSelect,
 ) {
+  let eventLog = [];
+  let replayIntegrity;
+  try {
+    eventLog = await decodeSubmissionHistory(row.eventLogJson);
+    replayIntegrity = validateWritingHistory(eventLog, row.finalText);
+  } catch {
+    replayIntegrity = { version: 1, status: "incomplete", reason: "unreadable_history", eventCount: 0, eventIndex: null };
+  }
   return {
     id: row.id,
     assignment_id: row.assignmentId,
@@ -56,7 +66,8 @@ export function serializeSubmission(
     final_text: row.finalText,
     title: row.title,
     stats_json: parseJson(row.statsJson, {}),
-    event_log_json: parseJson(row.eventLogJson, []),
+    event_log_json: eventLog,
+    replay_integrity: replayIntegrity,
     paste_events_json: parseJson(row.pasteEventsJson, []),
     pause_events_json: parseJson(row.pauseEventsJson, []),
     submitted_at: row.submittedAt,

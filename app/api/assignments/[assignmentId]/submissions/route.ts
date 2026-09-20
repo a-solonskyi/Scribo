@@ -13,5 +13,5 @@ export async function GET(_request: Request, { params }: Context) {
   if (!(await getOwnedAssignment(professor.userId, assignmentId))) return errorResponse("Essay not found.", 404);
   const rows = await getDb().select().from(submissions)
     .where(eq(submissions.assignmentId, assignmentId)).orderBy(desc(submissions.submittedAt));
-  return Response.json(rows.map((row) => serializeSubmission(row)));
+  return Response.json(await Promise.all(rows.map((row) => serializeSubmission(row))));
 }

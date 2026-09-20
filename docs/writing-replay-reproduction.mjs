@@ -80,8 +80,7 @@ bulk.record("N".repeat(80), 200);
 check("bulk replacement without clipboard metadata", bulk.text, replayUntil(bulk.events, Infinity).text,
   { detectionMethod: bulk.events.at(-1).detection_method });
 
-// No events are dropped here: zero remaining slots causes slice(-0).
-// Partitioning inserts away from edits changes the order of timestamp ties.
+// Before the correctness fix, partitioning edits changed timestamp ties.
 const tied = recording();
 for (let index = 0; index < 4001; index += 1) {
   tied.record(index === 4000 ? "" : index % 2 ? "B" : "A", Math.max(100, index * 100));
@@ -90,7 +89,7 @@ check("equal timestamps before submission", tied.text, replayUntil(tied.events, 
 const savedTied = trimEventLog(tied.events);
 check("equal timestamps after submission", tied.text, replayUntil(savedTied, Infinity).text,
   { originalEvents: tied.events.length, savedEvents: savedTied.length });
-check("submission maximum with 4000 non-insert events", true, savedTied.length <= 4000);
+check("all events survive with 4000 non-insert events", tied.events.length, savedTied.length);
 
 // Conditional scenario: device wall clock moves backwards between changes.
 const rollback = recording();

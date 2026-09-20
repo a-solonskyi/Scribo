@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { getSubmission } from "../sites/database";
@@ -8,6 +8,7 @@ import {
 } from "../utils/characterOrigins";
 import { getPasteRangesForText } from "../utils/pasteHighlighting";
 import { replayUntil } from "../utils/replayEngine";
+import { getWritingTimeline, validateWritingHistory } from "../utils/writingHistory";
 import { formatDateTime } from "../utils/timeFormatting";
 import ActivityTimeline from "./ActivityTimeline";
 import AIPromptTab from "./AIPromptTab";
@@ -37,9 +38,6 @@ export default function SubmissionAnalyticsPage({ session }) {
   const [submission, setSubmission] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [replayTimeMs, setReplayTimeMs] = useState(0);
-  const [replayTouched, setReplayTouched] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
     async function load() {
@@ -63,7 +61,20 @@ export default function SubmissionAnalyticsPage({ session }) {
     return <ErrorState message={error || "Submission not found."} />;
   }
 
-  const eventLog = submission.event_log_json || [];
+  return <SubmissionAnalytics key={submission.id} submission={submission} session={session} />;
+}
+
+function SubmissionAnalytics({ submission, session }) {
+  const [replayTimeMs, setReplayTimeMs] = useState(0);
+  const [replayTouched, setReplayTouched] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
+  const integrity = useMemo(() => submission.replay_integrity?.status === "incomplete"
+    ? submission.replay_integrity
+    : validateWritingHistory(submission.event_log_json || [], submission.final_text || ""), [submission]);
+  const replayAvailable = integrity.status === "complete";
+  const eventLog = useMemo(() => replayAvailable
+    ? getWritingTimeline(submission.event_log_json || []) : [], [submission, replayAvailable]);
+
   const recordedPasteEvents = submission.paste_events_json || [];
   const pauseEvents = submission.pause_events_json || [];
   const stats = submission.stats_json || {};
@@ -143,7 +154,7 @@ export default function SubmissionAnalyticsPage({ session }) {
           </p>
         </div>
       </div>
-      <ErrorState message={error} />
+      {!replayAvailable ? <p className="error-state" role="status">Writing history is incomplete. The submitted essay is preserved, but an accurate replay is unavailable.</p> : null}
 
       <nav className="analytics-tabs" aria-label="Submission analytics sections">
         {tabs.map(([id, label]) => (
@@ -170,12 +181,12 @@ export default function SubmissionAnalyticsPage({ session }) {
         <div className="analytics-grid compact-grid">
           <section className="analysis-panel wide">
             <h2>Replay writing process</h2>
-            <ReplayPlayer
+            {replayAvailable ? <ReplayPlayer
               eventLog={eventLog}
               timeMs={replayTimeMs}
               onTimeChange={setReplayTimeMs}
               onReplayTouch={() => setReplayTouched(true)}
-            />
+            /> : <p className="empty-state">Replay unavailable for this submission.</p>}
           </section>
 
           <section className="analysis-panel wide">
@@ -237,7 +248,7 @@ export default function SubmissionAnalyticsPage({ session }) {
         <AIPromptTab
           submission={submission}
           stats={displayStats}
-          eventLog={eventLog}
+          eventLog={submission.event_log_json || []}
           pasteEvents={pasteEvents}
           pauseEvents={pauseEvents}
         />

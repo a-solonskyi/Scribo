@@ -1,3 +1,5 @@
+import { getWritingSplice, orderWritingEvents } from "./writingHistory.js";
+
 export const BULK_INSERT_PASTE_THRESHOLD = 80;
 
 function clamp(value, min, max) {
@@ -56,23 +58,11 @@ export function originMapToRanges(originMap = []) {
 }
 
 export function applyChangeToOriginMap(originMap, change, insertedIsPasted) {
-  const nextMap = [...originMap];
-  const position = clamp(change.position || 0, 0, nextMap.length);
-  const deletedCount = clamp(
-    change.deletedCharacterCount ?? change.deleted_character_count ?? 0,
-    0,
-    nextMap.length - position
+  const { position, deletedCount, insertedText } = getWritingSplice(change, originMap.length);
+  return originMap.slice(0, position).concat(
+    new Array(insertedText.length).fill(Boolean(insertedIsPasted)),
+    originMap.slice(position + deletedCount)
   );
-  const insertedLength = (
-    change.insertedText ||
-    change.inserted_text ||
-    change.pasted_text ||
-    ""
-  ).length;
-  const insertedOrigins = new Array(insertedLength).fill(Boolean(insertedIsPasted));
-
-  nextMap.splice(position, deletedCount, ...insertedOrigins);
-  return nextMap;
 }
 
 export function countOriginRanges(ranges = [], textLength = Infinity) {
@@ -122,6 +112,7 @@ function pasteMatchesEvent(paste, event) {
 }
 
 export function isPasteOriginEvent(event, pasteEvents = []) {
+  if (event.inserted_origin === "typed") return false;
   if (
     event.event_type === "paste" ||
     event.inserted_origin === "paste" ||
@@ -135,16 +126,12 @@ export function isPasteOriginEvent(event, pasteEvents = []) {
 
 export function reconstructOriginMap(eventLog = [], pasteEvents = []) {
   let originMap = [];
-  const sortedEvents = [...eventLog].sort(
-    (a, b) => (a.timestamp_ms || 0) - (b.timestamp_ms || 0)
-  );
+  const sortedEvents = orderWritingEvents(eventLog);
 
   for (const event of sortedEvents) {
-    originMap = applyChangeToOriginMap(
-      originMap,
-      event,
-      isPasteOriginEvent(event, pasteEvents)
-    );
+    try {
+      originMap = applyChangeToOriginMap(originMap, event, isPasteOriginEvent(event, pasteEvents));
+    } catch { return []; }
   }
 
   return originMap;
@@ -152,9 +139,7 @@ export function reconstructOriginMap(eventLog = [], pasteEvents = []) {
 
 export function getEffectivePasteEvents(eventLog = [], pasteEvents = []) {
   const effective = pasteEvents.map((paste) => ({ ...paste }));
-  const sortedEvents = [...eventLog].sort(
-    (a, b) => (a.timestamp_ms || 0) - (b.timestamp_ms || 0)
-  );
+  const sortedEvents = orderWritingEvents(eventLog);
 
   for (const event of sortedEvents) {
     if (!isPasteOriginEvent(event, pasteEvents)) continue;

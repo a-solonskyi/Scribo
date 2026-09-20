@@ -12,7 +12,7 @@ export async function GET(_request: Request, { params }: Context) {
   const { submissionId } = await params;
   const row = await getOwnedSubmission(professor.userId, submissionId);
   if (!row) return errorResponse("Submission not found.", 404);
-  return Response.json(serializeSubmission(row.submission, row.assignment));
+  return Response.json(await serializeSubmission(row.submission, row.assignment));
 }
 
 export async function DELETE(_request: Request, { params }: Context) {

@@ -9,7 +9,7 @@ import {
   getAssignmentByPublicToken,
 } from "../sites/database";
 import { getTextStats } from "../utils/textStats";
-import { trimEventLog } from "../utils/eventCompression";
+import { createWritingClock, initializeWritingEvents } from "../utils/writingHistory";
 import {
   applyChangeToOriginMap,
   countOriginRanges,
@@ -153,7 +153,7 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
   const [studentName, setStudentName] = useState(initialDraft?.studentName || "");
   const [essayHtml, setEssayHtml] = useState(initialDraft?.essayHtml || "");
   const [essayText, setEssayText] = useState(initialDraft?.essayText || "");
-  const [eventLog, setEventLog] = useState(initialDraft?.eventLog || []);
+  const [eventLog, setEventLog] = useState(() => initializeWritingEvents(initialDraft?.eventLog || []));
   const [pasteEvents, setPasteEvents] = useState(initialDraft?.pasteEvents || []);
   const [pasteOriginRanges, setPasteOriginRanges] = useState(() => initialDraft?.pasteOriginRanges || originMapToRanges(reconstructOriginMap(initialDraft?.eventLog || [], initialDraft?.pasteEvents || [])));
   const [pauseEvents, setPauseEvents] = useState(initialDraft?.pauseEvents || []);
@@ -162,7 +162,9 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
   const [error, setError] = useState("");
   const [startedAt] = useState(() => initialDraft?.startedAt || Date.now());
   const previousTextRef = useRef(initialDraft?.essayText || "");
-  const lastEventRef = useRef((initialDraft?.eventLog || []).at(-1) || null);
+  const lastEventRef = useRef(eventLog.at(-1) || null);
+  const clockRef = useRef(null);
+  if (!clockRef.current) clockRef.current = createWritingClock({ eventLog, startedAt });
   const pendingPasteRef = useRef(null);
   const originMapRef = useRef(originRangesToMap((initialDraft?.essayText || "").length, pasteOriginRanges));
   const allowNavigationRef = useRef(false);
@@ -189,7 +191,7 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
     cursorPosition,
     isPasteTransaction,
   }) => {
-    const timestampMs = Date.now() - startedAt;
+    const timestampMs = clockRef.current();
     const previousText = previousTextRef.current;
     const event = createWritingEvent({
       previousText,
@@ -209,7 +211,7 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
     const pause = maybeCreatePause(lastEventRef.current, timestampMs);
     if (pause) setPauseEvents((current) => [...current, pause]);
 
-    let recordedEvent = event;
+    let recordedEvent = { ...event, sequence: (lastEventRef.current?.sequence ?? -1) + 1 };
 
     if (event.event_type === "paste") {
       const pasteEventId =
@@ -231,7 +233,7 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
       };
 
       recordedEvent = {
-        ...event,
+        ...recordedEvent,
         paste_event_id: pasteEventId,
       };
       setPasteEvents((current) => {
@@ -260,7 +262,7 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
     position,
     detectionMethod,
   }) => {
-    const timestampMs = Date.now() - startedAt;
+    const timestampMs = clockRef.current();
     const existingPending = pendingPasteRef.current;
     if (
       existingPending &&
@@ -309,14 +311,13 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
 
     try {
       const draftRevision = account ? await autosave.flush() : null;
-      const compressedEvents = trimEventLog(eventLog);
       const finalPastedCharacters = countOriginRanges(
         pasteOriginRanges,
         essayText.length
       );
       const stats = computeSubmissionStats({
         finalText: essayText,
-        eventLog: compressedEvents,
+        eventLog,
         pasteEvents,
         pauseEvents,
       });
@@ -334,7 +335,7 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
           pasteOriginRanges,
           pasteDetectionVersion: 2,
         },
-        event_log_json: compressedEvents,
+        event_log_json: eventLog,
         paste_events_json: pasteEvents,
         pause_events_json: pauseEvents,
       });
