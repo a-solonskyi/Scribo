@@ -6,6 +6,7 @@ import { DatabaseSync } from "node:sqlite";
 import { createWritingEvent } from "../src/utils/writingAnalytics.js";
 import { replayUntil } from "../src/utils/replayEngine.js";
 import { decodeSubmissionHistory } from "../src/utils/submissionHistory.js";
+import { decodeDraft } from "../src/utils/draftEncoding.js";
 
 const [origin, databasePath] = process.argv.slice(2);
 if (!origin || !["127.0.0.1", "localhost"].includes(new URL(origin).hostname) || !databasePath) {
@@ -86,6 +87,31 @@ try {
   assert.equal(legacy.replay_integrity.status, "complete");
   assert.deepEqual(legacy.event_log_json, events);
   await request(`/api/submissions/${guest.id}`, {}, 401);
+  checks++;
+
+  const accountRow = db.prepare("SELECT * FROM submissions WHERE assignment_id=? AND id<>? AND student_name=?").get(id, guest.id, "Replay test");
+  const damagedEvents = JSON.stringify(events.slice(-4000));
+  db.prepare("UPDATE submissions SET event_log_json=? WHERE id=?").run(damagedEvents, accountRow.id);
+  let cursor = null;
+  let candidate;
+  do {
+    const page = await request(`/api/replay-recovery${cursor ? `?after=${encodeURIComponent(cursor)}` : ""}`, { headers: headers(professor) });
+    candidate ||= page.items.find((item) => item.id === accountRow.id);
+    cursor = page.nextCursor;
+  } while (cursor);
+  assert.equal(candidate.status, "recoverable");
+  await request("/api/replay-recovery", {}, 401);
+  await request("/api/replay-recovery", { method: "POST", headers: headers(professor), body: JSON.stringify({ submissionId: "missing" }) }, 404);
+  const recovered = await request("/api/replay-recovery", { method: "POST", headers: headers(professor), body: JSON.stringify({ submissionId: accountRow.id }) });
+  assert.equal(recovered.status, "recovered");
+  const restored = await request(`/api/submissions/${accountRow.id}`, { headers: headers(professor) });
+  assert.equal(restored.replay_integrity.status, "complete");
+  assert.deepEqual(restored.event_log_json, events);
+  assert.equal(restored.stats_json.replayRecovery.backup, undefined);
+  const stats = JSON.parse(db.prepare("SELECT stats_json FROM submissions WHERE id=?").get(accountRow.id).stats_json);
+  assert.equal((await decodeDraft(stats.replayRecovery.backup)).event_log_json, damagedEvents);
+  const repeat = await request("/api/replay-recovery", { method: "POST", headers: headers(professor), body: JSON.stringify({ submissionId: accountRow.id }) });
+  assert.equal(repeat.status, "complete");
   checks++;
   console.log(JSON.stringify({ integrationChecks: checks, status: "passed", eventsPerSubmission: events.length }));
 } finally {

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 import { createClass, deleteClass, getClasses } from "../sites/database";
 import ClassList from "./ClassList";
@@ -74,6 +75,7 @@ export default function ProfessorDashboard({ session }) {
           <p className="eyebrow">Classes</p>
           <h1>Professor dashboard</h1>
         </div>
+        <Link className="text-button" to="/replay-recovery">Check writing replays</Link>
       </div>
 
       <form className="inline-create" onSubmit={handleCreateClass}>

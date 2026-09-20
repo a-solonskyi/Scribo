@@ -59,13 +59,20 @@ export async function serializeSubmission(
   } catch {
     replayIntegrity = { version: 1, status: "incomplete", reason: "unreadable_history", eventCount: 0, eventIndex: null };
   }
+  const parsedStats = parseJson(row.statsJson, {});
+  const stats: Record<string, unknown> = parsedStats && typeof parsedStats === "object" && !Array.isArray(parsedStats) ? parsedStats : {};
+  // Keep recovery backups server-side; exports and replay need only metadata.
+  if (stats.replayRecovery && typeof stats.replayRecovery === "object") {
+    const { backup: _backup, ...metadata } = stats.replayRecovery as Record<string, unknown>;
+    stats.replayRecovery = metadata;
+  }
   return {
     id: row.id,
     assignment_id: row.assignmentId,
     student_name: row.studentName,
     final_text: row.finalText,
     title: row.title,
-    stats_json: parseJson(row.statsJson, {}),
+    stats_json: stats,
     event_log_json: eventLog,
     replay_integrity: replayIntegrity,
     paste_events_json: parseJson(row.pasteEventsJson, []),

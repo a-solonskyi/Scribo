@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Pause, Play, SkipForward } from "lucide-react";
 
 import { getReplayDuration } from "../utils/replayEngine";
+import { createPlaybackClock } from "../utils/playbackClock";
 import { formatDuration } from "../utils/timeFormatting";
 
 const SPEEDS = [1, 2, 5, 10, 20];
@@ -47,32 +48,40 @@ export default function ReplayPlayer({
   const [internalTimeMs, setInternalTimeMs] = useState(0);
   const timeMs = controlledTimeMs ?? internalTimeMs;
   const durationMs = useMemo(() => getReplayDuration(eventLog), [eventLog]);
+  const clock = useMemo(() => createPlaybackClock({ durationMs }), [durationMs, eventLog]);
+  const publishedTimeRef = useRef(null);
   const histogram = useMemo(
     () => getReplayHistogram(eventLog, durationMs),
     [eventLog, durationMs]
   );
 
-  function updateTime(nextTime) {
+  const publishTime = useCallback((nextTime) => {
+    publishedTimeRef.current = nextTime;
     if (onTimeChange) onTimeChange(nextTime);
     else setInternalTimeMs(nextTime);
+  }, [onTimeChange]);
+
+  function updateTime(nextTime) {
+    clock.seek(nextTime);
+    publishTime(nextTime);
   }
 
+  useEffect(() => { clock.setSpeed(speed); }, [clock, speed]);
   useEffect(() => {
-    if (!playing) return undefined;
+    if (timeMs !== publishedTimeRef.current) clock.seek(timeMs);
+  }, [clock, timeMs]);
 
-    const startedAt = Date.now();
-    const baseTime = timeMs;
+  useEffect(() => {
+    if (!playing) { clock.pause(); return undefined; }
+    clock.play();
     const timer = window.setInterval(() => {
-      const nextTime = Math.min(
-        durationMs,
-        baseTime + (Date.now() - startedAt) * speed
-      );
-      updateTime(nextTime);
+      const nextTime = clock.read();
+      publishTime(nextTime);
       if (nextTime >= durationMs) setPlaying(false);
     }, 120);
 
-    return () => window.clearInterval(timer);
-  }, [playing, speed, timeMs, durationMs]);
+    return () => { window.clearInterval(timer); clock.pause(); };
+  }, [playing, clock, durationMs, publishTime]);
 
   function reset() {
     setPlaying(false);
@@ -96,6 +105,8 @@ export default function ReplayPlayer({
           type="button"
           onClick={() => {
             onReplayTouch?.();
+            if (!playing && timeMs >= durationMs) updateTime(0);
+            if (playing) { clock.pause(); publishTime(clock.read()); }
             setPlaying(!playing);
           }}
           aria-label={playing ? "Pause replay" : "Play replay"}

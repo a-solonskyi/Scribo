@@ -16,6 +16,7 @@ import StudentWritingPage from "./components/StudentWritingPage";
 import DeadlinePrototypePage from "./components/DeadlinePrototypePage";
 import DeadlineComparisonPage from "./components/DeadlineComparisonPage";
 import SubmissionAnalyticsPage from "./components/SubmissionAnalyticsPage";
+import ReplayRecoveryPage from "./components/ReplayRecoveryPage";
 import { ErrorState, LoadingState } from "./components/LoadingState";
 import { getCurrentSession, onAuthChange } from "./sites/auth";
 
@@ -62,6 +63,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/replay-recovery" element={<ProtectedRoute session={session}><ReplayRecoveryPage /></ProtectedRoute>} />
         <Route path="/prototypes/deadline" element={<DeadlinePrototypePage />} />
         <Route path="/prototypes/deadline/compare" element={<DeadlineComparisonPage />} />
         <Route path="/login" element={<LoginPage session={session} />} />

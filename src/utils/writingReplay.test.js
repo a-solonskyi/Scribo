@@ -103,6 +103,7 @@ test("missing operations, malformed positions, lengths, sequences and final text
   assert.equal(validateWritingHistory(log.events, "xyz!").reason, "final_text_mismatch");
   assert.equal(validateWritingHistory(null, "essay").status, "incomplete");
   assert.equal(validateWritingHistory([null], "essay").status, "incomplete");
+  assert.deepEqual(getEffectivePasteEvents([null]), []);
   assert.throws(() => applyWritingEvent("", log.events[1]), /invalid_position/);
 });
 

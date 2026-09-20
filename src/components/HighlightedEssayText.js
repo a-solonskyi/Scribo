@@ -9,6 +9,7 @@ export default function HighlightedEssayText({
   pasteEvents,
   eventLog,
   originRanges = null,
+  originsAuthoritative = false,
 }) {
   const highlightedHtml = getHighlightedHtml(
     html,
@@ -27,7 +28,9 @@ export default function HighlightedEssayText({
     );
   }
 
-  const segments = getHighlightedSegments(
+  const segments = originsAuthoritative && !originRanges?.length
+    ? [{ text, pasted: false }]
+    : getHighlightedSegments(
     text,
     pasteEvents,
     eventLog,

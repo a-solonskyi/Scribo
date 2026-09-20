@@ -84,6 +84,14 @@ export async function getSubmission(submissionId) {
   return request(`/api/submissions/${submissionId}`, { cache: "no-store" });
 }
 
+export function checkReplayRecovery(after) {
+  return request(`/api/replay-recovery${after ? `?after=${encodeURIComponent(after)}` : ""}`, { cache: "no-store" });
+}
+
+export function recoverSubmissionReplay(submissionId) {
+  return request("/api/replay-recovery", { method: "POST", body: JSON.stringify({ submissionId }) });
+}
+
 export async function getResponseAnnotations(submissionId) {
   return request(`/api/submissions/${submissionId}/annotations`, { cache: "no-store" });
 }

@@ -7,7 +7,7 @@ import {
   getEffectivePasteEvents,
 } from "../utils/characterOrigins";
 import { getPasteRangesForText } from "../utils/pasteHighlighting";
-import { replayUntil } from "../utils/replayEngine";
+import { createReplayIndex } from "../utils/replayEngine";
 import { getWritingTimeline, validateWritingHistory } from "../utils/writingHistory";
 import { formatDateTime } from "../utils/timeFormatting";
 import ActivityTimeline from "./ActivityTimeline";
@@ -21,6 +21,8 @@ import ProcessMetrics from "./ProcessMetrics";
 import ReplayPlayer from "./ReplayPlayer";
 import ResponseTab from "./ResponseTab";
 import StatsCards from "./StatsCards";
+
+const EMPTY_EVENTS = [];
 
 function getEstimatedStartTime(submission, stats) {
   if (stats.firstEventAtMs === null || stats.firstEventAtMs === undefined) {
@@ -75,20 +77,20 @@ function SubmissionAnalytics({ submission, session }) {
   const eventLog = useMemo(() => replayAvailable
     ? getWritingTimeline(submission.event_log_json || []) : [], [submission, replayAvailable]);
 
-  const recordedPasteEvents = submission.paste_events_json || [];
-  const pauseEvents = submission.pause_events_json || [];
+  const recordedPasteEvents = submission.paste_events_json || EMPTY_EVENTS;
+  const pauseEvents = submission.pause_events_json || EMPTY_EVENTS;
   const stats = submission.stats_json || {};
-  const pasteEvents = getEffectivePasteEvents(eventLog, recordedPasteEvents);
+  const pasteEvents = useMemo(() => getEffectivePasteEvents(eventLog, recordedPasteEvents), [eventLog, recordedPasteEvents]);
   const storedOriginRanges =
     stats.pasteDetectionVersion >= 2 && Array.isArray(stats.pasteOriginRanges)
       ? stats.pasteOriginRanges
       : null;
-  const finalPasteOriginRanges = getPasteRangesForText(
+  const finalPasteOriginRanges = useMemo(() => getPasteRangesForText(
     submission.final_text || "",
     pasteEvents,
     eventLog,
     storedOriginRanges
-  );
+  ), [submission.final_text, pasteEvents, eventLog, storedOriginRanges]);
   const finalPastedCharacters = countOriginRanges(
     finalPasteOriginRanges,
     (submission.final_text || "").length
@@ -106,7 +108,8 @@ function SubmissionAnalytics({ submission, session }) {
     totalPastedCharacters: totalDetectedPastedCharacters,
     finalPastedCharacters,
   };
-  const replay = replayUntil(eventLog, replayTimeMs);
+  const replayIndex = useMemo(() => createReplayIndex(eventLog, pasteEvents), [eventLog, pasteEvents]);
+  const replay = replayIndex.seek(replayTimeMs);
   const visibleEssayText = replayTouched ? replay.text : submission.final_text;
   const visibleEssayHtml = replayTouched
     ? ""
@@ -114,10 +117,9 @@ function SubmissionAnalytics({ submission, session }) {
   const visiblePasteEvents = replayTouched
     ? pasteEvents.filter((event) => (event.timestamp_ms || 0) <= replayTimeMs)
     : pasteEvents;
-  const visibleEventLog = replayTouched
-    ? eventLog.filter((event) => (event.timestamp_ms || 0) <= replayTimeMs)
-    : eventLog;
-  const visibleOriginRanges = replayTouched ? null : finalPasteOriginRanges;
+  const visibleEventLog = useMemo(() => replayTouched
+    ? eventLog.slice(0, replay.eventCount) : eventLog, [eventLog, replayTouched, replay.eventCount]);
+  const visibleOriginRanges = replayTouched ? replay.originRanges : finalPasteOriginRanges;
   const estimatedStartTime = getEstimatedStartTime(submission, displayStats);
   const tabs = [
     ["overview", "Overview"],
@@ -197,6 +199,7 @@ function SubmissionAnalytics({ submission, session }) {
               pasteEvents={visiblePasteEvents}
               eventLog={visibleEventLog}
               originRanges={visibleOriginRanges}
+              originsAuthoritative={replayTouched}
             />
           </section>
 

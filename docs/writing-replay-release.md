@@ -15,3 +15,13 @@ Verification: 36 unit tests, 15 audit reproduction checks, and four local HTTP i
 No destructive database migration is needed for the storage format change. Older application versions cannot read the new compressed history format, so any rollback must retain the new decoder or convert these records losslessly first.
 
 The original audit documents pre-fix behavior. Its reproduction script now expects all events to be preserved and passes. Recovery of older submissions and playback optimization follow this release separately.
+
+## Recovery and performance follow-up
+
+The correctness release was published successfully as Site version 26, from `971a94e27d2bc8253099ddeceb72f08ec5f2fdfa` (the same tested source tree as `41ee0a2d`, with deployment history merged).
+
+The follow-up adds a professor-only **Check writing replays** page. Its read-only check pages through the professor's submissions five at a time. A repair is offered only for one complete account draft matching assignment, submission timestamp, student name, and final essay text. Repair rechecks the candidate, updates only the process history/statistics, and retains losslessly encoded original history/statistics/paste/pause fields in `stats_json.replayRecovery.backup`. Conditional updates reject concurrent changes; repeated recovery of an already complete history is a no-op. Backups remain server-side. Missing or ambiguous histories are left unchanged.
+
+Playback builds a bounded checkpoint index once, updates paste-origin ranges with the same splice as text, and resumes from a nearby checkpoint or the previous frame. Its monotonic clock survives render delays, pause/resume, speed changes and seeking. In a local synthetic benchmark of 6,000 events and 100 seeks, full text/origin reconstruction took about 563 ms; building the index took 1.7 ms and indexed seeks took 0.5 ms. Every text result matched. This measures the reconstruction functions, not full browser rendering.
+
+Follow-up verification: 40 unit tests and five local HTTP integration scenarios pass, including recovery matching, retained backups, safe retry and authorization. Browser verification restored a damaged local fixture and showed one recovered history. Production recovery requires the professor's signed-in session; no automatic inference or destructive replacement is performed for histories without a verified source.

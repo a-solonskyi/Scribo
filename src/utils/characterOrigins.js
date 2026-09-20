@@ -65,6 +65,22 @@ export function applyChangeToOriginMap(originMap, change, insertedIsPasted) {
   );
 }
 
+// Sparse ranges avoid copying one boolean per character on every replay edit.
+export function applyChangeToOriginRanges(ranges, change, textLength, insertedIsPasted) {
+  const { position, deletedCount, insertedText } = getWritingSplice(change, textLength);
+  const cutEnd = position + deletedCount;
+  const shift = insertedText.length - deletedCount;
+  const next = [];
+  for (const range of ranges) {
+    const leftEnd = Math.min(range.end, position);
+    if (leftEnd > range.start) next.push({ start: range.start, end: leftEnd });
+    const rightStart = Math.max(range.start, cutEnd);
+    if (range.end > rightStart) next.push({ start: rightStart + shift, end: range.end + shift });
+  }
+  if (insertedIsPasted && insertedText.length) next.push({ start: position, end: position + insertedText.length });
+  return sanitizeOriginRanges(next, textLength + shift);
+}
+
 export function countOriginRanges(ranges = [], textLength = Infinity) {
   const safeLength = Number.isFinite(textLength)
     ? Math.max(0, textLength)
@@ -85,7 +101,7 @@ export function isBulkInsertEvent(event) {
 }
 
 function normalizeText(text = "") {
-  return text.replace(/\s+/gu, " ").trim().toLowerCase();
+  return (typeof text === "string" ? text : "").replace(/\s+/gu, " ").trim().toLowerCase();
 }
 
 function pasteMatchesEvent(paste, event) {
@@ -112,6 +128,7 @@ function pasteMatchesEvent(paste, event) {
 }
 
 export function isPasteOriginEvent(event, pasteEvents = []) {
+  if (!event || typeof event !== "object") return false;
   if (event.inserted_origin === "typed") return false;
   if (
     event.event_type === "paste" ||
@@ -138,6 +155,7 @@ export function reconstructOriginMap(eventLog = [], pasteEvents = []) {
 }
 
 export function getEffectivePasteEvents(eventLog = [], pasteEvents = []) {
+  pasteEvents = Array.isArray(pasteEvents) ? pasteEvents.filter((paste) => paste && typeof paste === "object") : [];
   const effective = pasteEvents.map((paste) => ({ ...paste }));
   const sortedEvents = orderWritingEvents(eventLog);
 
