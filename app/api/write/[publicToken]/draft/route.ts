@@ -2,6 +2,7 @@ import { getChatGPTUser } from "@/app/chatgpt-auth";
 import { getRawDb } from "@/db";
 import { findStudentDraft, serializeStudentDraft } from "@/lib/server/student-drafts";
 import { encodeDraft } from "@/src/utils/draftEncoding";
+import { validateDraftPayload } from "@/src/utils/draftValidation";
 
 export const dynamic = "force-dynamic";
 type Context = { params: Promise<{ publicToken: string }> };
@@ -58,15 +59,11 @@ export async function PUT(request: Request, context: Context) {
   const draft = body?.draft;
   const revision = body?.revision;
   const baseRevision = body?.baseRevision;
-  if (!draft || typeof draft !== "object" ||
-      typeof draft.studentName !== "string" || draft.studentName.length > 180 ||
-      typeof draft.essayText !== "string" || draft.essayText.length > 150000 ||
-      typeof draft.essayHtml !== "string" || draft.essayHtml.length > 500000 ||
-      ![draft.eventLog, draft.pasteEvents, draft.pasteOriginRanges, draft.pauseEvents].every(Array.isArray) ||
-      !Number.isFinite(draft.startedAt) ||
-      typeof revision !== "string" || !/^[\w-]{16,80}$/.test(revision) ||
-      !(baseRevision === null || (typeof baseRevision === "string" && /^[\w-]{16,80}$/.test(baseRevision)))) {
-    return response({ error: "Invalid draft or draft too large. Download a copy before leaving." }, 400);
+  const validation = validateDraftPayload({ draft, revision, baseRevision });
+  if (validation) {
+    const requestId = crypto.randomUUID();
+    console.warn("draft_validation_rejected", { requestId, code: validation.code, field: validation.field });
+    return response({ ...validation, requestId }, 400);
   }
   const existing = await findStudentDraft(assignment.id, user.userId);
   if (existing?.submitted_at) return response({ error: "This essay has already been submitted. Download any additional edits before reloading." }, 409);

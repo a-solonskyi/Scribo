@@ -68,13 +68,20 @@ export function createDraftSaver({ save, persist, notify, revision = null, initi
     schedule();
   }
 
-  async function flush() {
+  async function flush({ retryValidation = false } = {}) {
     clearTimeout(timer);
     if (inFlight) {
       await inFlight;
-      return flush();
+      return flush({ retryValidation });
     }
     if (stopped || !pending) return revision;
+    // Explicit user retries may resend a rejected snapshot. Authentication,
+    // conflicts and missing assignments still require user resolution.
+    if (blocked && retryValidation && [400, 413].includes(failureError?.status)) {
+      blocked = false;
+      blockedStatus = null;
+      retry = null; // Send the latest pending edits, never an older rejected copy.
+    }
     if (blocked) throw failureError;
     const sending = retry || pending;
     notify({ state: "saving" });
@@ -82,6 +89,7 @@ export function createDraftSaver({ save, persist, notify, revision = null, initi
       try {
         const result = await save({ ...sending, baseRevision: revision });
         revision = result.revision;
+        failureError = null;
         retry = null;
         acknowledged = sending.draft;
         if (pending === sending) pending = null;
@@ -110,6 +118,7 @@ export function createDraftSaver({ save, persist, notify, revision = null, initi
   return {
     update,
     flush,
+    recoveryState: () => ({ revision, pendingRevision: pending?.revision ?? null, retryRevision: retry?.revision ?? null, dirty: Boolean(pending || inFlight) }),
     isDirty: () => Boolean(pending || inFlight),
     stop() { stopped = true; clearTimeout(timer); },
   };

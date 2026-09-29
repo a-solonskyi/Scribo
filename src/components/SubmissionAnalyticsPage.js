@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Component, useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { getSubmission } from "../sites/database";
@@ -21,8 +21,22 @@ import ProcessMetrics from "./ProcessMetrics";
 import ReplayPlayer from "./ReplayPlayer";
 import ResponseTab from "./ResponseTab";
 import StatsCards from "./StatsCards";
+import { sanitizeEventMetadata, sanitizeStatistics, sanitizePasteEvents, sanitizePauseEvents } from "../utils/submissionMetadata";
 
-const EMPTY_EVENTS = [];
+class AnalyticsBoundary extends Component {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  render() {
+    if (!this.state.failed) return this.props.children;
+    const submission = this.props.submission;
+    return <section className="page-section">
+      <Link to={`/assignment/${submission.assignment_id}`}>Back to submissions</Link>
+      <h1>{submission.student_name}</h1>
+      <p className="error-state" role="alert">Some writing details could not be displayed. The original submission has not been changed. Your student's essay is shown below.</p>
+      <div className="essay-display">{submission.final_text}</div>
+    </section>;
+  }
+}
 
 function getEstimatedStartTime(submission, stats) {
   if (stats.firstEventAtMs === null || stats.firstEventAtMs === undefined) {
@@ -63,7 +77,9 @@ export default function SubmissionAnalyticsPage({ session }) {
     return <ErrorState message={error || "Submission not found."} />;
   }
 
-  return <SubmissionAnalytics key={submission.id} submission={submission} session={session} />;
+  return <AnalyticsBoundary key={submission.id} submission={submission}>
+    <SubmissionAnalytics submission={submission} session={session} />
+  </AnalyticsBoundary>;
 }
 
 function SubmissionAnalytics({ submission, session }) {
@@ -75,12 +91,13 @@ function SubmissionAnalytics({ submission, session }) {
     : validateWritingHistory(submission.event_log_json || [], submission.final_text || ""), [submission]);
   const replayAvailable = integrity.status === "complete";
   const eventLog = useMemo(() => replayAvailable
-    ? getWritingTimeline(submission.event_log_json || []) : [], [submission, replayAvailable]);
+    ? getWritingTimeline(sanitizeEventMetadata(submission.event_log_json || [])) : [], [submission, replayAvailable]);
 
-  const recordedPasteEvents = submission.paste_events_json || EMPTY_EVENTS;
-  const pauseEvents = submission.pause_events_json || EMPTY_EVENTS;
-  const stats = submission.stats_json || {};
-  const pasteEvents = useMemo(() => getEffectivePasteEvents(eventLog, recordedPasteEvents), [eventLog, recordedPasteEvents]);
+  const recordedPasteEvents = useMemo(() => sanitizePasteEvents(submission.paste_events_json), [submission]);
+  const pauseEvents = useMemo(() => sanitizePauseEvents(submission.pause_events_json), [submission]);
+  const stats = useMemo(() => sanitizeStatistics(submission.stats_json), [submission]);
+  const pasteEvents = useMemo(() => stats.analyticsVersion === 1
+    ? recordedPasteEvents : getEffectivePasteEvents(eventLog, recordedPasteEvents), [eventLog, recordedPasteEvents, stats.analyticsVersion]);
   const storedOriginRanges =
     stats.pasteDetectionVersion >= 2 && Array.isArray(stats.pasteOriginRanges)
       ? stats.pasteOriginRanges
@@ -157,6 +174,7 @@ function SubmissionAnalytics({ submission, session }) {
         </div>
       </div>
       {!replayAvailable ? <p className="error-state" role="status">Writing history is incomplete. The submitted essay is preserved, but an accurate replay is unavailable.</p> : null}
+      {stats.analyticsSource === "text_only_incomplete_history" ? <p className="muted-line">Word and character counts are available. Process metrics cannot be established from this incomplete history.</p> : null}
 
       <nav className="analytics-tabs" aria-label="Submission analytics sections">
         {tabs.map(([id, label]) => (

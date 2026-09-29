@@ -3,6 +3,8 @@ import { getDb } from "@/db";
 import { assignments, classes, responseAnnotations, submissions } from "@/db/schema";
 import { decodeSubmissionHistory } from "@/src/utils/submissionHistory";
 import { validateWritingHistory } from "@/src/utils/writingHistory";
+import { sanitizeStatistics, sanitizePasteEvents, sanitizePauseEvents } from "@/src/utils/submissionMetadata";
+import { deriveWritingEvidence } from "@/src/utils/submissionStatistics";
 
 export function parseJson(value: string | null, fallback: unknown) {
   if (!value) return fallback;
@@ -66,17 +68,24 @@ export async function serializeSubmission(
     const { backup: _backup, ...metadata } = stats.replayRecovery as Record<string, unknown>;
     stats.replayRecovery = metadata;
   }
+  const rawPastes = parseJson(row.pasteEventsJson, []);
+  const rawPauses = parseJson(row.pauseEventsJson, []);
+  const derived = stats.analyticsVersion === 1
+    ? deriveWritingEvidence(eventLog, replayIntegrity.status === "complete") : null;
   return {
     id: row.id,
     assignment_id: row.assignmentId,
     student_name: row.studentName,
     final_text: row.finalText,
     title: row.title,
-    stats_json: stats,
+    stats_json: { ...sanitizeStatistics(stats), replayIntegrity },
+    // Raw metadata is available for evidence export; no database row is
+    // modified when a legacy or malformed record is opened.
+    recorded_metadata: { stats_json: stats, paste_events_json: rawPastes, pause_events_json: rawPauses },
     event_log_json: eventLog,
     replay_integrity: replayIntegrity,
-    paste_events_json: parseJson(row.pasteEventsJson, []),
-    pause_events_json: parseJson(row.pauseEventsJson, []),
+    paste_events_json: derived ? derived.pastes : sanitizePasteEvents(rawPastes),
+    pause_events_json: derived ? derived.pauses : sanitizePauseEvents(rawPauses),
     submitted_at: row.submittedAt,
     ...(assignment
       ? {

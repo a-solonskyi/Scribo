@@ -13,11 +13,13 @@ export function formatDuration(ms) {
 
 export function formatDateTime(value) {
   if (!value) return "Not recorded";
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return "Not recorded";
 
   return new Intl.DateTimeFormat(undefined, {
     dateStyle: "medium",
     timeStyle: "short",
-  }).format(new Date(value));
+  }).format(date);
 }
 
 export function formatNumber(value, digits = 0) {
