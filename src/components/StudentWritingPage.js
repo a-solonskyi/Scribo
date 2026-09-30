@@ -29,6 +29,8 @@ import { ErrorState, LoadingState } from "./LoadingState";
 import DraftBackupButton from "./DraftBackupButton";
 import { SUBMISSION_CLIENT_VERSION } from "../utils/submissionCompatibility";
 
+import { normalizeMoodleEmail } from "../utils/grading";
+
 const guestExplanation = "Your draft is saved automatically after each change in this browser’s local storage on this device. It usually survives closing the tab or restarting the browser. It can be lost if you clear this site’s data, use private browsing, change browser or device, or your browser removes stored data.";
 
 function signInPath(publicToken) {
@@ -160,6 +162,7 @@ function createPasteEventId() {
 
 function StudentWritingSession({ publicToken, assignment, initialDraft, account, transferGuest }) {
   const [studentName, setStudentName] = useState(initialDraft?.studentName || "");
+  const [moodleEmail, setMoodleEmail] = useState(initialDraft?.moodleEmail || "");
   const [essayHtml, setEssayHtml] = useState(initialDraft?.essayHtml || "");
   const [essayText, setEssayText] = useState(initialDraft?.essayText || "");
   const [eventLog, setEventLog] = useState(() => initializeWritingEvents(initialDraft?.eventLog || []));
@@ -179,9 +182,9 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
   const allowNavigationRef = useRef(false);
   const textStats = useMemo(() => getTextStats(essayText), [essayText]);
   const draft = useMemo(() => ({
-    publicToken, studentName, essayHtml, essayText, eventLog, pasteEvents,
+    publicToken, studentName, ...(assignment.max_grade !== null && assignment.max_grade !== undefined ? { moodleEmail } : {}), essayHtml, essayText, eventLog, pasteEvents,
     pasteOriginRanges, pauseEvents, startedAt,
-  }), [publicToken, studentName, essayHtml, essayText, eventLog, pasteEvents, pasteOriginRanges, pauseEvents, startedAt]);
+  }), [publicToken, studentName, moodleEmail, assignment.max_grade, essayHtml, essayText, eventLog, pasteEvents, pasteOriginRanges, pauseEvents, startedAt]);
   const autosave = useStudentAutosave({ publicToken, account, draft, submitted, transferGuest });
 
   useEffect(() => {
@@ -319,6 +322,7 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
     setError("");
 
     try {
+      const email = assignment.max_grade != null ? normalizeMoodleEmail(moodleEmail) : null;
       const draftRevision = account ? await autosave.flush({ retryValidation: true }) : null;
       const finalPastedCharacters = countOriginRanges(
         pasteOriginRanges,
@@ -336,6 +340,7 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
         assignment_id: assignment.id,
         ...(account ? { student_draft_revision: draftRevision, expected_user_id: account.user.id } : {}),
         student_name: studentName.trim(),
+        ...(email !== null ? { moodle_email: email } : {}),
         title: assignment.topic,
         final_text: essayText,
         stats_json: {
@@ -427,6 +432,7 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
       {!account ? <details className="student-storage-details"><summary>Where is my guest draft saved?</summary><p>{guestExplanation} Download a copy for safekeeping, or sign in to save this draft to your account.</p></details> : null}
 
       <fieldset className="student-writing-fields" disabled={saving}>
+      <div className={assignment.max_grade != null ? "student-identity-fields" : undefined}>
       <label className="student-name-field">
         <input
           value={studentName}
@@ -438,6 +444,15 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
           required
         />
       </label>
+
+      {assignment.max_grade != null ? <label className="student-moodle-email">
+        <span>Moodle email address</span>
+        <input type="email" autoComplete="email" maxLength={254} required
+          value={moodleEmail} onChange={event => setMoodleEmail(event.target.value)}
+          placeholder="student@example.edu" aria-describedby="moodle-email-help" />
+        <small id="moodle-email-help">Use the email in your Moodle profile so your professor can import your grade.</small>
+      </label> : null}
+      </div>
 
       <EssayEditor
         essayHtml={essayHtml}

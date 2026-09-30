@@ -6,6 +6,7 @@ import {
   getResponseAnnotations,
   updateResponseAnnotation,
 } from '../sites/database';
+import SubmissionGrade from './SubmissionGrade';
 import { downloadAnnotatedResponsePdf } from '../utils/annotatedResponsePdf';
 import { buildResponseSegments } from '../utils/responseAnnotations';
 import { ErrorState, LoadingState } from './LoadingState';
@@ -377,6 +378,7 @@ export default function ResponseTab({ submission }) {
         >
           Export PDF
         </button>
+        <SubmissionGrade submissionId={submission.id} disabled={saving || Boolean(popup)} />
         <span role="status">
           {saving
             ? 'Saving…'

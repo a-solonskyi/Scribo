@@ -2,12 +2,15 @@ import { eq } from "drizzle-orm";
 import { getDb, getRawDb } from "@/db";
 import { getChatGPTUser } from "@/app/chatgpt-auth";
 import { findStudentDraft } from "@/lib/server/student-drafts";
-import { assignments, submissions } from "@/db/schema";
+import { assignments } from "@/db/schema";
 import { errorResponse, stringValue } from "@/lib/server/data";
 import { assertSubmissionFits, prepareSubmissionHistory, readSubmissionJson } from "@/src/utils/submissionHistory";
 import { decodeDraft } from "@/src/utils/draftEncoding";
 import { matchesLegacySubmission, SUBMISSION_CLIENT_VERSION } from "@/src/utils/submissionCompatibility";
 import { deriveSubmissionStatistics } from "@/src/utils/submissionStatistics";
+
+import { getMaxGrade } from "@/lib/server/grading";
+import { normalizeMoodleEmail } from "@/src/utils/grading";
 
 function jsonText(value: unknown, fallback: unknown) {
   return JSON.stringify(value ?? fallback);
@@ -97,6 +100,7 @@ export async function POST(request: Request) {
     return Response.json({ code: "unsupported_client_version", error: "This tab uses an unsupported submission format. Keep it open. Download a full backup if available; otherwise contact your professor before updating. Your saved draft has not been changed." }, { status: 409 });
   }
 
+  let sourceEmail = body.moodle_email;
   let sourceEvents = body.event_log_json ?? [];
   let sourcePastes = body.paste_events_json ?? [];
   let sourcePauses = body.pause_events_json ?? [];
@@ -125,12 +129,25 @@ export async function POST(request: Request) {
     }
     // Only the acknowledged revision may supply an account submission. Keep
     // its complete history, even for the precisely recognized legacy client.
+    sourceEmail = snapshot.moodleEmail;
     sourceEvents = snapshot.eventLog;
     sourcePastes = snapshot.pasteEvents;
     sourcePauses = snapshot.pauseEvents;
     sourceStats = { finalHtml: snapshot.essayHtml };
     accountSubmission = { userId: user.userId, revision };
   }
+
+  let moodleEmail: string | null = null;
+  if (await getMaxGrade(assignmentId) !== null) {
+    try { moodleEmail = normalizeMoodleEmail(sourceEmail); }
+    catch { return errorResponse("Enter your Moodle email address before submitting. Your essay and saved draft are still available."); }
+  }
+  const submissionId = crypto.randomUUID();
+  const db = getRawDb();
+  const emailStatements = moodleEmail === null ? [] : [db.prepare(`
+    INSERT INTO submission_moodle_emails (submission_id, email, updated_at)
+    SELECT id, ?, ? FROM submissions WHERE id = ?
+  `).bind(moodleEmail, new Date().toISOString(), submissionId)];
 
   let history;
   let storedStats;
@@ -151,17 +168,17 @@ export async function POST(request: Request) {
   if (accountSubmission) {
     const { userId, revision } = accountSubmission;
     const submittedAt = new Date().toISOString();
-    const db = getRawDb();
     const result = await db.batch([
       db.prepare(`
         INSERT INTO submissions (id, assignment_id, student_name, final_text, title, stats_json, event_log_json, paste_events_json, pause_events_json, submitted_at)
         SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ? FROM student_drafts
         WHERE assignment_id = ? AND user_id = ? AND revision = ? AND submitted_at IS NULL
-      `).bind(crypto.randomUUID(), assignmentId, studentName, finalText,
+      `).bind(submissionId, assignmentId, studentName, finalText,
         stringValue(body.title).slice(0, 240) || null,
         storedStats,
         history.encoded, storedPastes, storedPauses,
         submittedAt, assignmentId, userId, revision),
+      ...emailStatements,
       db.prepare(`
         UPDATE student_drafts SET submitted_at = ?, updated_at = ?
         WHERE assignment_id = ? AND user_id = ? AND revision = ? AND submitted_at IS NULL
@@ -174,18 +191,12 @@ export async function POST(request: Request) {
     return Response.json({ ok: true }, { status: 201 });
   }
 
-  await getDb().insert(submissions).values({
-    id: crypto.randomUUID(),
-    assignmentId,
-    studentName,
-    finalText,
-    title: stringValue(body.title).slice(0, 240) || null,
-    statsJson: storedStats,
-    eventLogJson: history.encoded,
-    pasteEventsJson: storedPastes,
-    pauseEventsJson: storedPauses,
-    submittedAt: new Date().toISOString(),
-  });
+  await db.batch([
+    db.prepare(`INSERT INTO submissions (id, assignment_id, student_name, final_text, title, stats_json, event_log_json, paste_events_json, pause_events_json, submitted_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(submissionId, assignmentId, studentName, finalText,
+        stringValue(body.title).slice(0, 240) || null, storedStats, history.encoded, storedPastes, storedPauses, new Date().toISOString()),
+    ...emailStatements,
+  ]);
 
   return Response.json({ ok: true }, { status: 201 });
 }

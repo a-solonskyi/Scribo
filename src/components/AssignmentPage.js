@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 
 import {
   deleteSubmission,
@@ -11,8 +11,12 @@ import { ErrorState, LoadingState } from "./LoadingState";
 import SubmissionList from "./SubmissionList";
 import AssignmentInstructions from "./AssignmentInstructions";
 
+import GradesView from "./GradesView";
+
 export default function AssignmentPage() {
   const { assignmentId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const view = searchParams.get("view") === "grades" ? "grades" : "submissions";
   const [assignment, setAssignment] = useState(null);
   const [submissions, setSubmissions] = useState([]);
   const [copied, setCopied] = useState(false);
@@ -83,6 +87,7 @@ export default function AssignmentPage() {
         <div>
           <h1>{assignment?.topic}</h1>
           <AssignmentInstructions instructions={assignment?.instructions} />
+          {assignment?.max_grade ? <p className="muted-line">Maximum grade: {assignment.max_grade}</p> : null}
           {assignment?.deadline ? (
             <p className="muted-line">Deadline: {formatDateTime(assignment.deadline)}</p>
           ) : null}
@@ -98,11 +103,14 @@ export default function AssignmentPage() {
           {copied ? "Copied" : "Copy link"}
         </button>
       </div>
-      <h2>Submissions</h2>
-      <SubmissionList
+      <div className="assignment-view-switch" aria-label="Essay folder view">
+        <button type="button" aria-pressed={view === "submissions"} onClick={() => setSearchParams({})}>Submissions</button>
+        <button type="button" aria-pressed={view === "grades"} onClick={() => setSearchParams({ view: "grades" })}>Grades</button>
+      </div>
+      {view === "grades" ? <GradesView assignment={assignment} /> : <SubmissionList
         submissions={submissions}
         onDelete={handleDeleteSubmission}
-      />
+      />}
     </section>
   );
 }
