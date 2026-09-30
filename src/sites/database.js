@@ -110,11 +110,3 @@ export async function updateResponseAnnotation(annotationId, patch) {
 export async function deleteResponseAnnotation(annotationId) {
   await request(`/api/annotations/${annotationId}`, { method: "DELETE" });
 }
-
-export async function deleteResponseAnnotations(annotationIds) {
-  if (!annotationIds.length) return;
-  await request("/api/annotations/bulk-delete", {
-    method: "POST",
-    body: JSON.stringify({ annotationIds }),
-  });
-}

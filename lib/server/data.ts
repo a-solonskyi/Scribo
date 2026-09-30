@@ -112,7 +112,7 @@ export function serializeAnnotation(row: typeof responseAnnotations.$inferSelect
     text_quote: row.textQuote,
     comment_text: row.commentText,
     color: row.color,
-    drawing_path_json: parseJson(row.drawingPathJson, null),
+    note_position: row.type === "note" ? parseJson(row.drawingPathJson, null) : null,
     created_at: row.createdAt,
     updated_at: row.updatedAt,
   };
