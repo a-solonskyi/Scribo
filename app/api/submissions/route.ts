@@ -6,6 +6,8 @@ import { assignments, submissions } from "@/db/schema";
 import { errorResponse, stringValue } from "@/lib/server/data";
 import { assertSubmissionFits, prepareSubmissionHistory, readSubmissionJson } from "@/src/utils/submissionHistory";
 import { decodeDraft } from "@/src/utils/draftEncoding";
+import { matchesLegacySubmission, SUBMISSION_CLIENT_VERSION } from "@/src/utils/submissionCompatibility";
+import { deriveSubmissionStatistics } from "@/src/utils/submissionStatistics";
 
 function jsonText(value: unknown, fallback: unknown) {
   return JSON.stringify(value ?? fallback);
@@ -91,18 +93,16 @@ export async function POST(request: Request) {
     .from(assignments).where(eq(assignments.id, assignmentId)).limit(1);
   if (!assignment) return errorResponse("Essay link is no longer available.", 404);
 
-  let history;
-  let storedStats;
-  const storedPastes = jsonText(body.paste_events_json, []);
-  const storedPauses = jsonText(body.pause_events_json, []);
-  try {
-    history = await prepareSubmissionHistory(body.event_log_json ?? [], finalText);
-    storedStats = jsonText({ ...stats, deviceInfo: getDeviceInfo(request), replayIntegrity: history.integrity }, {});
-    assertSubmissionFits([finalText, studentName, stringValue(body.title), storedStats, history.encoded, storedPastes, storedPauses]);
-  } catch (error) {
-    return submissionError(error, 500);
+  if (body.client_version !== undefined && body.client_version !== SUBMISSION_CLIENT_VERSION) {
+    return Response.json({ code: "unsupported_client_version", error: "This tab uses an unsupported submission format. Keep it open. Download a full backup if available; otherwise contact your professor before updating. Your saved draft has not been changed." }, { status: 409 });
   }
 
+  let sourceEvents = body.event_log_json ?? [];
+  let sourcePastes = body.paste_events_json ?? [];
+  let sourcePauses = body.pause_events_json ?? [];
+  let sourceStats = stats;
+  let accountSubmission: { userId: string; revision: string } | null = null;
+  let compatibility = null;
   if (Object.hasOwn(body, "student_draft_revision")) {
     const user = await getChatGPTUser();
     if (!user) return errorResponse("Sign in with ChatGPT again before submitting.", 401);
@@ -111,13 +111,45 @@ export async function POST(request: Request) {
     if (origin && origin !== new URL(request.url).origin) return errorResponse("Invalid request origin.", 403);
     const revision = stringValue(body.student_draft_revision);
     const draft = await findStudentDraft(assignmentId, user.userId);
-    // A retry after a lost submission response must not submit the essay twice.
+    // Preserve the existing atomic, same-account retry contract.
     if (draft?.submitted_at) return Response.json({ ok: true });
-    if (!draft || draft.revision !== revision) return errorResponse("Your account draft changed. Download your edits and reload before submitting.", 409);
-    const snapshot = await decodeDraft(draft.draft_json);
-    if (snapshot.essayText !== finalText || JSON.stringify(snapshot.eventLog) !== JSON.stringify(body.event_log_json)) {
-      return errorResponse("Your latest writing has not finished saving. Wait for saving to finish, then submit again.", 409);
+    if (!draft || draft.revision !== revision) return errorResponse("Your account draft changed. Keep this tab open. Download a full backup if available; otherwise contact your professor before reloading.", 409);
+    let snapshot;
+    try { snapshot = await decodeDraft(draft.draft_json); }
+    catch { return errorResponse("Your saved draft could not be read. Keep this tab open, download a full backup if available and contact your professor.", 409); }
+    if (snapshot?.essayText !== finalText || snapshot?.studentName?.trim() !== studentName || JSON.stringify(snapshot?.eventLog) !== JSON.stringify(body.event_log_json)) {
+      if (!matchesLegacySubmission(snapshot, body)) {
+        return Response.json({ code: "draft_content_mismatch", error: "This tab's essay or writing history differs from its saved draft. Waiting will not resolve this. Keep this tab open. Download a full backup if available; otherwise contact your professor before updating or choosing a saved draft." }, { status: 409 });
+      }
+      compatibility = { version: 1, source: "verified_account_draft", draftRevision: revision, receivedEventCount: body.event_log_json.length };
     }
+    // Only the acknowledged revision may supply an account submission. Keep
+    // its complete history, even for the precisely recognized legacy client.
+    sourceEvents = snapshot.eventLog;
+    sourcePastes = snapshot.pasteEvents;
+    sourcePauses = snapshot.pauseEvents;
+    sourceStats = { finalHtml: snapshot.essayHtml };
+    accountSubmission = { userId: user.userId, revision };
+  }
+
+  let history;
+  let storedStats;
+  const storedPastes = jsonText(sourcePastes, []);
+  const storedPauses = jsonText(sourcePauses, []);
+  try {
+    history = await prepareSubmissionHistory(sourceEvents, finalText);
+    storedStats = jsonText({
+      ...deriveSubmissionStatistics({ finalText, eventLog: sourceEvents, integrity: history.integrity, reportedStats: sourceStats }),
+      deviceInfo: getDeviceInfo(request), replayIntegrity: history.integrity,
+      ...(compatibility ? { submissionCompatibility: compatibility } : {}),
+    }, {});
+    assertSubmissionFits([finalText, studentName, stringValue(body.title), storedStats, history.encoded, storedPastes, storedPauses]);
+  } catch (error) {
+    return submissionError(error, 500);
+  }
+
+  if (accountSubmission) {
+    const { userId, revision } = accountSubmission;
     const submittedAt = new Date().toISOString();
     const db = getRawDb();
     const result = await db.batch([
@@ -129,14 +161,14 @@ export async function POST(request: Request) {
         stringValue(body.title).slice(0, 240) || null,
         storedStats,
         history.encoded, storedPastes, storedPauses,
-        submittedAt, assignmentId, user.userId, revision),
+        submittedAt, assignmentId, userId, revision),
       db.prepare(`
         UPDATE student_drafts SET submitted_at = ?, updated_at = ?
         WHERE assignment_id = ? AND user_id = ? AND revision = ? AND submitted_at IS NULL
-      `).bind(submittedAt, submittedAt, assignmentId, user.userId, revision),
+      `).bind(submittedAt, submittedAt, assignmentId, userId, revision),
     ]);
     if (!result[0].meta.changes) {
-      const latest = await findStudentDraft(assignmentId, user.userId);
+      const latest = await findStudentDraft(assignmentId, userId);
       if (!latest?.submitted_at) return errorResponse("Your draft changed in another tab. Download your edits and reload before submitting.", 409);
     }
     return Response.json({ ok: true }, { status: 201 });

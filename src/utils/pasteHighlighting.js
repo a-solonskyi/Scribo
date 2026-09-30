@@ -4,6 +4,7 @@ import {
   sanitizeOriginRanges,
 } from "./characterOrigins.js";
 import { applyWritingEvent, orderWritingEvents } from "./writingHistory.js";
+import { sanitizePasteEvents } from "./submissionMetadata.js";
 
 export function getHighlightedSegments(
   finalText,
@@ -56,7 +57,7 @@ export function getHighlightedHtml(
   plainText = "",
   originRanges = null
 ) {
-  if (!html || typeof window === "undefined" || !window.DOMParser) return "";
+  if (typeof html !== "string" || !html || typeof window === "undefined" || !window.DOMParser) return "";
 
   const parser = new window.DOMParser();
   const doc = parser.parseFromString(html, "text/html");
@@ -65,17 +66,16 @@ export function getHighlightedHtml(
   const textNodes = [];
   const fullText = collectFormattedTextNodes(doc.body, textNodes);
 
-  const sourceText = plainText || fullText;
-  const sourceRanges = getPasteRanges(
-    sourceText,
+  // Formatting is optional; it must never substitute a different essay.
+  // Exact comparison preserves Unicode, whitespace and annotation offsets.
+  if (fullText !== plainText) return "";
+
+  const ranges = getPasteRanges(
+    plainText,
     pasteEvents,
     eventLog,
     originRanges
   );
-  const ranges =
-    sourceText === fullText
-      ? sourceRanges
-      : mapRangesBetweenText(sourceText, fullText, sourceRanges);
   if (!ranges.length) return doc.body.innerHTML;
 
   for (let nodeIndex = textNodes.length - 1; nodeIndex >= 0; nodeIndex -= 1) {
@@ -121,38 +121,6 @@ export function getHighlightedHtml(
   }
 
   return doc.body.innerHTML;
-}
-
-function mapRangesBetweenText(sourceText, targetText, ranges) {
-  if (!ranges.length) return [];
-
-  const targetNormalized = normalizeWithMap(targetText);
-  let searchCursor = 0;
-
-  return ranges
-    .map((range) => {
-      const sourceSegment = sourceText.slice(range.start, range.end);
-      const normalizedSegment = normalizeForSearch(sourceSegment);
-      if (normalizedSegment.length < 3) return null;
-
-      const normalizedIndex = targetNormalized.text.indexOf(
-        normalizedSegment,
-        searchCursor
-      );
-      const fallbackIndex =
-        normalizedIndex >= 0
-          ? normalizedIndex
-          : targetNormalized.text.indexOf(normalizedSegment);
-      if (fallbackIndex < 0) return null;
-
-      searchCursor = fallbackIndex + normalizedSegment.length;
-      return {
-        ...range,
-        start: targetNormalized.map[fallbackIndex],
-        end: targetNormalized.map[fallbackIndex + normalizedSegment.length - 1] + 1,
-      };
-    })
-    .filter(Boolean);
 }
 
 function sanitizeHtmlTree(root) {
@@ -233,6 +201,7 @@ function getPasteRanges(
   eventLog = [],
   originRanges = null
 ) {
+  pasteEvents = sanitizePasteEvents(pasteEvents);
   if (Array.isArray(originRanges)) {
     const exactRanges = sanitizeOriginRanges(originRanges, finalText.length);
     if (exactRanges.length) {

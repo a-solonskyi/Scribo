@@ -1,4 +1,5 @@
 import { getWritingSplice, orderWritingEvents } from "./writingHistory.js";
+import { sanitizePasteEvents, sanitizeEventMetadata } from "./submissionMetadata.js";
 
 export const BULK_INSERT_PASTE_THRESHOLD = 80;
 
@@ -7,7 +8,8 @@ function clamp(value, min, max) {
 }
 
 export function sanitizeOriginRanges(ranges = [], textLength = 0) {
-  const normalized = ranges
+  const normalized = (Array.isArray(ranges) ? ranges : [])
+    .filter((range) => range && Number.isSafeInteger(range.start) && Number.isSafeInteger(range.end))
     .map((range) => ({
       start: clamp(Number(range.start) || 0, 0, textLength),
       end: clamp(Number(range.end) || 0, 0, textLength),
@@ -155,9 +157,9 @@ export function reconstructOriginMap(eventLog = [], pasteEvents = []) {
 }
 
 export function getEffectivePasteEvents(eventLog = [], pasteEvents = []) {
-  pasteEvents = Array.isArray(pasteEvents) ? pasteEvents.filter((paste) => paste && typeof paste === "object") : [];
+  pasteEvents = sanitizePasteEvents(pasteEvents);
   const effective = pasteEvents.map((paste) => ({ ...paste }));
-  const sortedEvents = orderWritingEvents(eventLog);
+  const sortedEvents = orderWritingEvents(sanitizeEventMetadata(eventLog));
 
   for (const event of sortedEvents) {
     if (!isPasteOriginEvent(event, pasteEvents)) continue;

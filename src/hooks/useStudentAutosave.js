@@ -62,7 +62,8 @@ export default function useStudentAutosave({ publicToken, account, draft, submit
 
   return {
     status, message,
-    flush: () => saverRef.current?.flush(),
+    flush: (options) => saverRef.current?.flush(options),
+    recoveryState: () => saverRef.current?.recoveryState() ?? { revision: account?.revision ?? null },
     stop: () => saverRef.current?.stop(),
     isDirty: () => account ? saverRef.current?.isDirty() : !localSavedRef.current,
   };

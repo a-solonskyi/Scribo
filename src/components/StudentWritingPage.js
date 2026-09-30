@@ -26,6 +26,8 @@ import EssayEditor from "./EssayEditor";
 import AssignmentDeadline from "./AssignmentDeadline";
 import AssignmentInstructions from "./AssignmentInstructions";
 import { ErrorState, LoadingState } from "./LoadingState";
+import DraftBackupButton from "./DraftBackupButton";
+import { SUBMISSION_CLIENT_VERSION } from "../utils/submissionCompatibility";
 
 const guestExplanation = "Your draft is saved automatically after each change in this browser’s local storage on this device. It usually survives closing the tab or restarting the browser. It can be lost if you clear this site’s data, use private browsing, change browser or device, or your browser removes stored data.";
 
@@ -93,7 +95,9 @@ function StudentDraftLoader({ publicToken }) {
       <AssignmentInstructions instructions={assignment.instructions} collapsible />
       <h2>{conflict ? "Choose the draft to continue" : "How would you like to save your progress?"}</h2>
       {conflict ? <>
-        <p>There is a different draft in your account and in this browser. Choose one to continue. Download the browser copy first if you need to keep both.</p>
+        <p>There is a different draft in your account and in this browser. Choose one to continue. Download a full backup first to keep both the browser essay and its writing history.</p>
+        <DraftBackupButton assignment={assignment} draft={local} userId={account.user?.id}
+          getSaveState={() => ({ ...browserBackupState(publicToken, account.user?.id), accountRevision: account.revision })} />
         <button className="draft-text-button" onClick={() => downloadEssay(assignment, local)}>Download browser copy</button>
         <div className="student-entry-options">
           <section className="student-entry-option">
@@ -126,6 +130,11 @@ function StudentDraftLoader({ publicToken }) {
       </>}
     </main>
   );
+}
+
+function browserBackupState(publicToken, userId) {
+  const backup = readStoredDraft(draftKey(publicToken, userId));
+  return { browserRevision: backup?.revision ?? null, baseRevision: backup?.baseRevision ?? null, dirty: backup?.dirty ?? null };
 }
 
 function downloadEssay(assignment, draft) {
@@ -310,7 +319,7 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
     setError("");
 
     try {
-      const draftRevision = account ? await autosave.flush() : null;
+      const draftRevision = account ? await autosave.flush({ retryValidation: true }) : null;
       const finalPastedCharacters = countOriginRanges(
         pasteOriginRanges,
         essayText.length
@@ -323,6 +332,7 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
       });
 
       await createSubmission({
+        client_version: SUBMISSION_CLIENT_VERSION,
         assignment_id: assignment.id,
         ...(account ? { student_draft_revision: draftRevision, expected_user_id: account.user.id } : {}),
         student_name: studentName.trim(),
@@ -378,6 +388,7 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
         <button className="filled-button student-submit-button" type="submit" disabled={saving}>
           {saving ? "Submitting" : "Submit"}
         </button>
+        {error ? <p className="error-state" role="alert">{error}</p> : null}
         <AssignmentInstructions instructions={assignment?.instructions} collapsible />
       </div>
 
@@ -386,7 +397,9 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
           <output className="student-save-status" aria-live="polite">{autosave.message}</output>
         </div>
         <div className="student-save-actions">
-          <button className="draft-text-button" type="button" onClick={() => downloadEssay(assignment, draft)}>Download a copy</button>
+          <button className="draft-text-button" type="button" onClick={() => downloadEssay(assignment, draft)}>Download text</button>
+          <DraftBackupButton assignment={assignment} draft={draft} userId={account?.user.id}
+            getSaveState={() => ({ ...autosave.recoveryState(), ...browserBackupState(publicToken, account?.user.id) })} />
           {account ? <a className="draft-text-button" href={`/signout-with-chatgpt?return_to=${encodeURIComponent(`/write/${publicToken}`)}`} target="_top" onClick={async (event) => {
             event.preventDefault();
             const href = event.currentTarget.href;
@@ -408,7 +421,7 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
             allowNavigationRef.current = true;
           }}>Sign in with ChatGPT</a> : null}
           {autosave.status.state === "conflict" ? <button className="draft-text-button" type="button" onClick={() => window.location.reload()}>Reload saved drafts</button> : null}
-          {autosave.status.state === "error" ? <button className="draft-text-button" type="button" onClick={() => autosave.flush().catch(() => {})}>Retry saving</button> : null}
+          {autosave.status.state === "error" ? <button className="draft-text-button" type="button" onClick={() => autosave.flush({ retryValidation: true }).catch(() => {})}>Retry saving</button> : null}
         </div>
       </div>
       {!account ? <details className="student-storage-details"><summary>Where is my guest draft saved?</summary><p>{guestExplanation} Download a copy for safekeeping, or sign in to save this draft to your account.</p></details> : null}
@@ -440,7 +453,6 @@ function StudentWritingSession({ publicToken, assignment, initialDraft, account,
       </div>
 
       </fieldset>
-      <ErrorState message={error} />
     </form>
     </div>
   );
