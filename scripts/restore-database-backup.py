@@ -124,7 +124,7 @@ if __name__ == '__main__':
         class NoRedirect(urllib.request.HTTPRedirectHandler):
             def redirect_request(self,*_args,**_kwargs):
                 return None
-        request = urllib.request.Request(args.url,data=b'',method='POST',headers={'X-Skribo-Backup-Key':token,'Accept':'application/json'})
+        request = urllib.request.Request(args.url,data=b'{}',method='POST',headers={'X-Skribo-Backup-Key':token,'Accept':'application/json','Content-Type':'application/json','User-Agent':'Skribo-Offline-Backup/1.0'})
         with urllib.request.build_opener(NoRedirect).open(request,timeout=120) as response:
             if response.status != 200 or 'application/json' not in response.headers.get('Content-Type',''):
                 raise ValueError('Export did not return a complete JSON snapshot')
