@@ -5,10 +5,8 @@ const PROMPT_BODY =
 
 function fencedBlock(language, value) {
   const content = typeof value === "string" ? value : JSON.stringify(value, null, 2);
-  const longestBacktickRun = Math.max(
-    0,
-    ...Array.from(content.matchAll(/`+/gu), (match) => match[0].length),
-  );
+  let longestBacktickRun = 0;
+  for (const match of content.matchAll(/`+/gu)) longestBacktickRun = Math.max(longestBacktickRun, match[0].length);
   const fence = "`".repeat(Math.max(3, longestBacktickRun + 1));
   return `${fence}${language}\n${content}\n${fence}`;
 }
@@ -44,6 +42,14 @@ function buildPromptFile({ submission, stats, eventLog, pasteEvents, pauseEvents
     "## Writing statistics",
     "",
     fencedBlock("json", stats),
+    "",
+    "## Evidence quality",
+    "",
+    fencedBlock("json", submission.replay_integrity || null),
+    "",
+    "## Original recorded metadata (may be incomplete or malformed)",
+    "",
+    fencedBlock("json", submission.recorded_metadata || null),
     "",
     "## Writing event log",
     "",

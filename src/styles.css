@@ -3226,5 +3226,8 @@ button:disabled {
   }
 }
 .recovery-actions { display: flex; flex-wrap: wrap; gap: 1rem; margin: 1.5rem 0; }
+.draft-backup-control { display: inline-flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.draft-backup-control [role="alert"] { max-width: 28rem; font-size: .875rem; }
+.student-header > .error-state { grid-column: 1 / -1; flex-basis: 100%; margin: 0; }
 .recovery-list { list-style: none; padding: 0; }
 .recovery-list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--light-gray); }
