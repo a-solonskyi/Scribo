@@ -7,6 +7,8 @@ export function validateDraftPayload({ draft, revision, baseRevision } = {}) {
     if (typeof draft[field] !== "string") return issue(field, "invalid_draft_field", `${label} has an unsupported format.`);
     if (draft[field].length > limit) return issue(field, "draft_field_too_large", `${label} exceeds the online save limit (${limit.toLocaleString("en-US")} characters).`);
   }
+  // Partial addresses must autosave while a student is typing. Older drafts omit this field.
+  if (draft.moodleEmail !== undefined && (typeof draft.moodleEmail !== "string" || draft.moodleEmail.length > 254)) return issue("moodleEmail", "invalid_draft_field", "Moodle email exceeds the save limit or has an unsupported format.");
   for (const field of ["eventLog", "pasteEvents", "pasteOriginRanges", "pauseEvents"]) {
     if (!Array.isArray(draft[field])) return issue(field, "invalid_draft_field", `The draft's ${field === "eventLog" ? "writing history" : "writing metadata"} has an unsupported format.`);
   }

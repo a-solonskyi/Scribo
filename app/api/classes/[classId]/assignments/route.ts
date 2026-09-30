@@ -1,10 +1,12 @@
 import { and, desc, eq, sql } from "drizzle-orm";
-import { getDb } from "@/db";
+import { getDb, getRawDb } from "@/db";
 import { assignments, submissions } from "@/db/schema";
 import { errorResponse, getOwnedClass, readJsonObject, serializeAssignment, stringValue } from "@/lib/server/data";
 import { requireApprovedProfessor } from "@/lib/server/professor";
 import { normalizeDeadline } from "@/src/utils/deadlines";
 import { normalizeInstructions } from "@/src/utils/assignmentInstructions";
+
+import { normalizeMaxGrade } from "@/src/utils/grading";
 
 type Context = { params: Promise<{ classId: string }> };
 
@@ -39,7 +41,9 @@ export async function POST(request: Request, { params }: Context) {
   if (!topic) return errorResponse("Essay topic is required.");
   let deadline: string | null;
   let instructions: string | null;
+  let maxGrade: number | null;
   try {
+    maxGrade = normalizeMaxGrade(body.max_grade);
     deadline = normalizeDeadline(body.deadline);
     instructions = normalizeInstructions(body.instructions);
   } catch (error) {
@@ -56,6 +60,11 @@ export async function POST(request: Request, { params }: Context) {
     deadline,
     createdAt: new Date().toISOString(),
   };
-  await getDb().insert(assignments).values(row);
-  return Response.json(serializeAssignment(row), { status: 201 });
+  const db = getRawDb();
+  const statements = [db.prepare(`INSERT INTO assignments (id, class_id, professor_id, topic, instructions, public_token, deadline, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+    .bind(row.id, row.classId, row.professorId, row.topic, row.instructions, row.publicToken, row.deadline, row.createdAt)];
+  if (maxGrade !== null) statements.push(db.prepare('INSERT INTO assignment_grade_settings (assignment_id, max_grade) VALUES (?, ?)').bind(row.id, maxGrade));
+  // D1 batch is atomic: an essay cannot be created with a missing requested maximum.
+  await db.batch(statements);
+  return Response.json({ ...serializeAssignment(row), max_grade: maxGrade }, { status: 201 });
 }

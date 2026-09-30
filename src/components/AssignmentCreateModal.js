@@ -15,6 +15,7 @@ export default function AssignmentCreateModal({
 }) {
   const [topic, setTopic] = useState("");
   const [instructions, setInstructions] = useState("");
+  const [maxGrade, setMaxGrade] = useState("");
   const [deadline, setDeadline] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -32,6 +33,7 @@ export default function AssignmentCreateModal({
         topic: topic.trim(),
         instructions: normalizeInstructions(instructions),
         deadline: localDeadlineToIso(deadline),
+        max_grade: maxGrade === "" ? null : Number(maxGrade),
       });
       onCreated(created);
     } catch (err) {
@@ -64,6 +66,13 @@ export default function AssignmentCreateModal({
             <span className="instructions-field-label">Instructions</span>
             <InstructionsEditor onChange={setInstructions} disabled={saving} />
           </div>
+          <label className="assignment-max-grade">
+            <span>Grade</span>
+            <input type="number" inputMode="numeric" min="1" max="100" step="1"
+              value={maxGrade} onChange={event => { if (/^\d*$/.test(event.target.value)) setMaxGrade(event.target.value); }}
+              disabled={saving} placeholder="Optional" aria-describedby="maximum-grade-help" />
+            <small id="maximum-grade-help">Maximum available score (1–100). Leave blank to use the default 100-point grading scale.</small>
+          </label>
           <DeadlinePicker value={deadline} onChange={setDeadline} disabled={saving} />
           <ErrorState message={error} />
           <button className="filled-button create-essay-button" type="submit" disabled={saving}>

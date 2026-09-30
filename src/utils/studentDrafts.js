@@ -26,12 +26,12 @@ export function removeStoredDraft(key) {
 }
 
 export function hasDraftContent(draft) {
-  return Boolean(draft && (draft.studentName?.trim() || draft.essayText || draft.eventLog?.length));
+  return Boolean(draft && (draft.studentName?.trim() || draft.moodleEmail?.trim() || draft.essayText || draft.eventLog?.length));
 }
 
 export function sameDraft(left, right) {
   const content = (draft) => draft ? JSON.stringify([
-    draft.studentName, draft.essayHtml, draft.essayText, draft.eventLog,
+    draft.studentName, draft.moodleEmail || "", draft.essayHtml, draft.essayText, draft.eventLog,
     draft.pasteEvents, draft.pasteOriginRanges, draft.pauseEvents, draft.startedAt,
   ]) : "";
   return content(left) === content(right);

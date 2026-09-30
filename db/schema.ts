@@ -1,4 +1,5 @@
-import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
+import { check, index, integer, real, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const approvedProfessors = sqliteTable(
   "approved_professors",
@@ -94,3 +95,29 @@ export const responseAnnotations = sqliteTable(
     index("idx_response_annotations_professor_id").on(table.professorId),
   ],
 );
+
+
+// Additive grading storage: existing essay and feedback tables remain unchanged.
+export const assignmentGradeSettings = sqliteTable("assignment_grade_settings", {
+  assignmentId: text("assignment_id").primaryKey().references(() => assignments.id, { onDelete: "cascade" }),
+  maxGrade: integer("max_grade").notNull(),
+}, table => [check("max_grade_range", sql`${table.maxGrade} BETWEEN 1 AND 100 AND ${table.maxGrade} = CAST(${table.maxGrade} AS INTEGER)`)]);
+
+export const submissionGrades = sqliteTable("submission_grades", {
+  id: text("id").primaryKey(),
+  submissionId: text("submission_id").notNull().references(() => submissions.id, { onDelete: "cascade" }),
+  score: real("score").notNull(),
+  revision: integer("revision").notNull(),
+  gradedBy: text("graded_by").notNull(),
+  createdAt: text("created_at").notNull(),
+}, table => [
+  uniqueIndex("idx_submission_grades_revision").on(table.submissionId, table.revision),
+  check("grade_score_range", sql`${table.score} BETWEEN 0 AND 100`),
+  check("grade_revision_positive", sql`${table.revision} >= 1`),
+]);
+
+export const submissionMoodleEmails = sqliteTable("submission_moodle_emails", {
+  submissionId: text("submission_id").primaryKey().references(() => submissions.id, { onDelete: "cascade" }),
+  email: text("email").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});

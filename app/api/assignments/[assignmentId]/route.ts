@@ -4,6 +4,8 @@ import { assignments, classes } from "@/db/schema";
 import { errorResponse, serializeAssignment } from "@/lib/server/data";
 import { requireApprovedProfessor } from "@/lib/server/professor";
 
+import { getMaxGrade } from "@/lib/server/grading";
+
 type Context = { params: Promise<{ assignmentId: string }> };
 
 export async function GET(_request: Request, { params }: Context) {
@@ -17,7 +19,7 @@ export async function GET(_request: Request, { params }: Context) {
     .where(and(eq(assignments.id, assignmentId), eq(assignments.professorId, professor.userId)))
     .limit(1);
   if (!row) return errorResponse("Essay not found.", 404);
-  return Response.json(serializeAssignment(row.assignment, row.className));
+  return Response.json({ ...serializeAssignment(row.assignment, row.className), max_grade: await getMaxGrade(assignmentId) });
 }
 
 export async function DELETE(_request: Request, { params }: Context) {

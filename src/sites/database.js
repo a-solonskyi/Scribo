@@ -110,3 +110,26 @@ export async function updateResponseAnnotation(annotationId, patch) {
 export async function deleteResponseAnnotation(annotationId) {
   await request(`/api/annotations/${annotationId}`, { method: "DELETE" });
 }
+
+
+export function getSubmissionGrade(submissionId) {
+  return request(`/api/submissions/${submissionId}/grade`, { cache: "no-store" });
+}
+export function saveSubmissionGrade(submissionId, payload) {
+  return request(`/api/submissions/${submissionId}/grade`, { method: "PUT", body: JSON.stringify(payload), signal: AbortSignal.timeout(15000) });
+}
+export function getAssignmentGrades(assignmentId) {
+  return request(`/api/assignments/${assignmentId}/grades`, { cache: "no-store" });
+}
+export async function exportMoodleGrades(assignmentId, entries) {
+  const response = await fetch(`/api/assignments/${assignmentId}/grades/moodle-export`, {
+    method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ entries }),
+  });
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    const error = new Error(data.error || "The export could not be completed.");
+    error.status = response.status;
+    throw error;
+  }
+  return response.blob();
+}

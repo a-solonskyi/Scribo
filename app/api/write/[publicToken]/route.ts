@@ -3,6 +3,8 @@ import { getDb } from "@/db";
 import { assignments } from "@/db/schema";
 import { errorResponse } from "@/lib/server/data";
 
+import { getMaxGrade } from "@/lib/server/grading";
+
 type Context = { params: Promise<{ publicToken: string }> };
 
 export async function GET(_request: Request, { params }: Context) {
@@ -21,6 +23,7 @@ export async function GET(_request: Request, { params }: Context) {
     topic: row.topic,
     instructions: row.instructions,
     deadline: row.deadline,
+    max_grade: await getMaxGrade(row.id),
     created_at: row.createdAt,
     public_token: row.publicToken,
   });

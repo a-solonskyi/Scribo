@@ -1,5 +1,5 @@
 import { Component, useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 
 import { getSubmission } from "../sites/database";
 import {
@@ -30,7 +30,7 @@ class AnalyticsBoundary extends Component {
     if (!this.state.failed) return this.props.children;
     const submission = this.props.submission;
     return <section className="page-section">
-      <Link to={`/assignment/${submission.assignment_id}`}>Back to submissions</Link>
+      <Link to={`/assignment/${submission.assignment_id}${searchParams.get("tab") === "grade" ? "?view=grades" : ""}`}>Back to submissions</Link>
       <h1>{submission.student_name}</h1>
       <p className="error-state" role="alert">Some writing details could not be displayed. The original submission has not been changed. Your student's essay is shown below.</p>
       <div className="essay-display">{submission.final_text}</div>
@@ -85,7 +85,8 @@ export default function SubmissionAnalyticsPage({ session }) {
 function SubmissionAnalytics({ submission, session }) {
   const [replayTimeMs, setReplayTimeMs] = useState(0);
   const [replayTouched, setReplayTouched] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(() => searchParams.get("tab") === "grade" ? "response" : "overview");
   const integrity = useMemo(() => submission.replay_integrity?.status === "incomplete"
     ? submission.replay_integrity
     : validateWritingHistory(submission.event_log_json || [], submission.final_text || ""), [submission]);
@@ -141,7 +142,7 @@ function SubmissionAnalytics({ submission, session }) {
   const tabs = [
     ["overview", "Overview"],
     ["essay", "Essay text"],
-    ["response", "Response"],
+    ["response", "Grade"],
     ["events", "Events"],
     ["technical", "Technical details"],
     ["ai-prompt", "AI prompt"],
@@ -151,8 +152,8 @@ function SubmissionAnalytics({ submission, session }) {
     <section className="page-section analytics-page">
       <Link
         className="text-button compact-back-link"
-        to={`/assignment/${submission.assignment_id}`}
-        aria-label="Back to submissions"
+        to={`/assignment/${submission.assignment_id}${searchParams.get("tab") === "grade" ? "?view=grades" : ""}`}
+        aria-label={searchParams.get("tab") === "grade" ? "Back to grades" : "Back to submissions"}
       >
         &lt;
       </Link>
